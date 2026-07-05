@@ -1,60 +1,106 @@
+
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Android Setup Hub</title>
 <style>
-body{font-family:Arial;margin:16px;background:#f3f3f3}
-.card{background:#fff;padding:12px;border-radius:10px;margin-bottom:12px}
-button,a{padding:8px 12px;border-radius:6px;border:none;background:#1976d2;color:#fff;text-decoration:none;cursor:pointer}
-.row{display:flex;gap:8px;align-items:center;margin:6px 0}
-input,textarea{width:100%;padding:8px}
-.used{background:#d9ffd9}
-small{color:#555}
-</style></head><body>
-<h2>Android Setup Hub</h2>
+body{font-family:Arial,sans-serif;background:#f2f2f2;margin:0;padding:16px}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px}
+textarea,input{width:100%;box-sizing:border-box;padding:10px;margin:6px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+button{padding:10px 14px;border:0;border-radius:8px;background:#0d6efd;color:#fff;font-weight:bold}
+.used{color:green;font-weight:bold}
+.small{font-size:13px;color:#666}
+</style>
+</head>
+<body>
 <div class="card">
-<b id="count">Đã dùng: 0/10</b>
+<h2>Android Setup Hub</h2>
+<div id="count">Đã dùng: 0/10</div>
 <div id="list"></div>
 </div>
+
 <div class="card">
 <h3>Password</h3>
-<input id="pass">
-<button onclick="copyPass()">📋 Copy Password</button>
+<input id="pwd">
+<button onclick="copyPwd()">Copy Password</button>
 </div>
+
+<div class="card">
+<h3>Cập nhật mail</h3>
+<div class="small">Mỗi dòng: email@abc.us|password</div>
+<textarea id="bulk" rows="8"></textarea>
+<button onclick="updateMail()">Cập nhật Mail</button>
+<button onclick="resetUsed()">Reset trạng thái</button>
+</div>
+
 <div class="card">
 <h3>8 Link nhanh</h3>
 <div id="links"></div>
 </div>
+
 <div class="card">
 <h3>Ghi chú</h3>
-<textarea id="note" rows="5"></textarea><br><button onclick="save()">💾 Lưu</button>
+<textarea id="note" rows="6"></textarea>
 </div>
-<div class="card">
-<h3>Cài đặt</h3>
-<small>Dán 10 mail (mỗi dòng 1 mail)</small>
-<textarea id="mails" rows="10"></textarea>
-<button onclick="updateMails()">Cập nhật Mail</button>
-<button onclick="resetUsed()">Reset trạng thái</button>
-</div>
+
 <script>
-let data=JSON.parse(localStorage.getItem("setupHub")||'{}');
-if(!data.mails)data={mails:Array(10).fill(""),used:Array(10).fill(false),pass:"",note:"",links:Array.from({length:8},(_,i)=>({name:"Link "+(i+1),url:"#"}))};
-function render(){
-document.getElementById("pass").value=data.pass;
-document.getElementById("note").value=data.note;
-document.getElementById("mails").value=data.mails.join("\n");
-let c=0,s="";
-data.mails.forEach((m,i)=>{if(data.used[i])c++;
-s+=`<div class='row ${data.used[i]?"used":""}'><div style="flex:1"><b>Mail ${i+1}</b><br>${m||"(trống)"}</div><button onclick="copyMail(${i})">${data.used[i]?"✅ Đã dùng":"📋 Copy"}</button></div>`});
-document.getElementById("list").innerHTML=s;
-document.getElementById("count").innerText=`Đã dùng: ${c}/10`;
-let l="";
-data.links.forEach((x,i)=>{l+=`<div class=row><input value="${x.name}" onchange="data.links[${i}].name=this.value;save()" style="max-width:120px"><input value="${x.url}" onchange="data.links[${i}].url=this.value;save()"><a target=_blank href="${x.url}">Mở</a></div>`});
-document.getElementById("links").innerHTML=l;
+let mails=JSON.parse(localStorage.mails||"[]");
+let used=JSON.parse(localStorage.used||"[]");
+let pwd=localStorage.pwd||"";
+let links=JSON.parse(localStorage.links||"null")||Array.from({length:8},(_,i)=>({name:"Link "+(i+1),url:""}));
+note.value=localStorage.note||"";
+pwd.value=pwd;
+
+function save(){
+ localStorage.mails=JSON.stringify(mails);
+ localStorage.used=JSON.stringify(used);
+ localStorage.pwd=JSON.stringify(document.getElementById('pwd').value).slice(1,-1);
+ localStorage.note=note.value;
+ localStorage.links=JSON.stringify(links);
+ render();
 }
-function save(){data.pass=pass.value;data.note=note.value;localStorage.setItem("setupHub",JSON.stringify(data));render();}
-function updateMails(){data.mails=mails.value.split(/\n/).map(line=>{line=line.trim();const match=line.match(/^.*?\.us/i);return match?match[0]:"";}).filter(line=>line!=="").slice(0,10);while(data.mails.length<10)data.mails.push("");data.used=Array(10).fill(false);save();}
-function resetUsed(){data.used=Array(10).fill(false);save();}
-async function copyMail(i){await navigator.clipboard.writeText(data.mails[i]||"");data.used[i]=true;save();}
-async function copyPass(){await navigator.clipboard.writeText(data.pass||"");}
+document.getElementById("pwd").oninput=save;
+note.oninput=save;
+
+function render(){
+ let c=used.filter(Boolean).length;
+ count.textContent="Đã dùng: "+c+"/10";
+ list.innerHTML="";
+ for(let i=0;i<10;i++){
+ let d=document.createElement("div");
+ d.className="row";
+ d.innerHTML="<div><b>Mail "+(i+1)+"</b><br>"+(mails[i]||"(trống)")+" "+(used[i]?'<span class=used>✅ Đã dùng</span>':'')+"</div>";
+ let b=document.createElement("button");
+ b.textContent="Copy";
+ b.onclick=()=>{
+   if(mails[i]) navigator.clipboard.writeText(mails[i]);
+   used[i]=!used[i];
+   save();
+ };
+ d.appendChild(b); list.appendChild(d);
+ }
+ linksDiv();
+}
+function linksDiv(){
+ links.innerHTML="";
+ links.forEach((l,i)=>{
+ let r=document.createElement("div");r.className="row";
+ r.innerHTML='<div style="flex:1"><input placeholder="Tên" value="'+l.name+'" onchange="links['+i+'].name=this.value;save()"><input placeholder="URL" value="'+l.url+'" onchange="links['+i+'].url=this.value;save()"></div>';
+ let b=document.createElement("button");b.textContent="Mở";b.onclick=()=>{if(l.url)window.open(l.url)};
+ r.appendChild(b);links.appendChild(r);
+ });
+}
+function updateMail(){
+ let arr=bulk.value.trim().split(/\n+/).filter(Boolean).slice(0,10).map(x=>x.split("|")[0].trim());
+ mails=arr; while(mails.length<10)mails.push("");
+ used=Array(10).fill(false);
+ save();
+}
+function resetUsed(){used=Array(10).fill(false);save();}
+function copyPwd(){navigator.clipboard.writeText(document.getElementById("pwd").value);}
 render();
-</script></body></html>
+</script>
+</body></html>
