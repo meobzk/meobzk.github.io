@@ -1,46 +1,23 @@
 
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Android Setup Hub</title>
-<style>
-body{font-family:Arial;background:#f4f4f4;padding:15px;max-width:700px;margin:auto}
-.card{background:#fff;border-radius:14px;padding:15px;margin:15px 0}
-.row{display:flex;gap:8px;align-items:center;margin:8px 0}
-.row>div:first-child{flex:1}
-input,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
-button{background:#0d6efd;color:#fff;border:0;border-radius:8px;padding:10px 14px;font-weight:bold}
-.used{color:green;font-weight:bold}
-.small{font-size:12px;color:#666}
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hub</title><style>
+body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}.card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}.row{display:flex;gap:8px;align-items:center;margin:8px 0}.grow{flex:1}input,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}button{padding:10px 14px;border:0;border-radius:8px;background:#1677ff;color:#fff}
+.used{color:green;font-weight:bold}details summary{cursor:pointer;font-weight:bold}
 </style></head><body>
-<div class=card><h2>Android Setup Hub</h2><div id=count></div><div id=mailList></div></div>
-<div class=card><h3>Password</h3><input id=pwd oninput=saveAll()><button onclick="navigator.clipboard.writeText(pwd.value)">📋 Copy Password</button></div>
-<div class=card><h3>8 Link nhanh</h3><div id=links></div></div>
-<div class=card><h3>Ghi chú</h3><textarea id=note rows=5 oninput=saveAll()></textarea></div>
-<div class=card><h3>Cập nhật mail</h3><div class=small>Mỗi dòng: email@abc.us|password</div><textarea id=bulk rows=8></textarea><div class=row><button onclick=updateMail()>Cập nhật Mail</button><button onclick=resetUsed()>Reset</button></div></div>
+<div class=card><h2>Android Setup Hub</h2><div id=cnt></div><div id=emails></div></div>
+<div class=card><h3>📥 Cập nhật mail</h3><textarea id=bulk rows=6 placeholder="email@abc.us|pass"></textarea><div class=row><button onclick=updateMail()>Cập nhật</button><button onclick=resetUsed()>Reset</button></div></div>
+<div class=card><h3>Password</h3><input id=pwd><button onclick="navigator.clipboard.writeText(pwd.value)">Copy Password</button></div>
+<div class=card><details><summary>🔗 8 Link nhanh (Nhấn để mở/thu gọn)</summary><div id=links style="margin-top:10px"></div></details></div>
+<div class=card><h3>Ghi chú</h3><textarea id=note rows=5></textarea></div>
 <script>
-let mails=JSON.parse(localStorage.mails||"[]"),used=JSON.parse(localStorage.used||"[]");
-while(mails.length<10)mails.push(""); while(used.length<10)used.push(false);
-pwd.value=localStorage.pwd||""; note.value=localStorage.note||"";
-let links=JSON.parse(localStorage.links||"null")||Array.from({length:8},(_,i)=>({name:"Link "+(i+1),url:""}));
-function saveAll(){localStorage.mails=JSON.stringify(mails);localStorage.used=JSON.stringify(used);localStorage.pwd=pwd.value;localStorage.note=note.value;localStorage.links=JSON.stringify(links);render();}
-function render(){
-count.textContent="Đã dùng: "+used.filter(x=>x).length+"/10";
-mailList.innerHTML="";
-for(let i=0;i<10;i++){
-let r=document.createElement("div");r.className="row";
-let d=document.createElement("div");
-d.innerHTML="<b>Mail "+(i+1)+"</b><br>"+(mails[i]||"(trống)")+(used[i]?" <span class=used>✅ Đã dùng</span>":"");
-let b=document.createElement("button");b.textContent="📋 Copy";b.onclick=()=>{if(mails[i])navigator.clipboard.writeText(mails[i]);used[i]=!used[i];saveAll();};
-r.append(d,b);mailList.append(r);}
-links.innerHTML="";
-links.forEach((l,i)=>{
-let r=document.createElement("div");r.className="row";
-let n=document.createElement("input");n.value=l.name;n.placeholder="Tên";n.oninput=e=>{links[i].name=e.target.value;saveAll();}
-let u=document.createElement("input");u.value=l.url;u.placeholder="URL";u.oninput=e=>{links[i].url=e.target.value;saveAll();}
-let b=document.createElement("button");b.textContent="Mở";b.onclick=()=>{if(links[i].url)window.open(links[i].url,"_blank");}
-let box=document.createElement("div");box.append(n,u);r.append(box,b);document.getElementById("links").append(r);
-});
-}
-function updateMail(){let arr=bulk.value.trim().split(/\n+/).filter(Boolean).slice(0,10).map(x=>x.split("|")[0].trim());while(arr.length<10)arr.push("");mails=arr;used=Array(10).fill(false);saveAll();}
-function resetUsed(){used=Array(10).fill(false);saveAll();}
+let mails=JSON.parse(localStorage.mails||"[]"),used=JSON.parse(localStorage.used||"[]");while(mails.length<10)mails.push("");while(used.length<10)used.push(false);
+pwd.value=localStorage.pwd||"";note.value=localStorage.note||"";let L=JSON.parse(localStorage.links||"null")||Array.from({length:8},(_,i)=>({n:"Link "+(i+1),u:""}));
+function save(){localStorage.mails=JSON.stringify(mails);localStorage.used=JSON.stringify(used);localStorage.pwd=pwd.value;localStorage.note=note.value;localStorage.links=JSON.stringify(L);render()}
+pwd.oninput=save;note.oninput=save;
+function render(){cnt.textContent="Đã dùng: "+used.filter(Boolean).length+"/10";emails.innerHTML="";
+for(let i=0;i<10;i++){let r=document.createElement("div");r.className="row";let d=document.createElement("div");d.className="grow";d.innerHTML="<b>Mail "+(i+1)+"</b><br>"+(mails[i]||"(trống)")+(used[i]?" <span class=used>✅ Đã dùng</span>":"");let b=document.createElement("button");b.textContent="📋 Copy";b.onclick=()=>{if(mails[i])navigator.clipboard.writeText(mails[i]);used[i]=!used[i];save()};r.append(d,b);emails.append(r)}
+links.innerHTML="";L.forEach((x,i)=>{let r=document.createElement("div");r.className="row";let box=document.createElement("div");box.className="grow";let n=document.createElement("input");n.value=x.n;n.oninput=e=>{L[i].n=e.target.value;save()};let u=document.createElement("input");u.value=x.u;u.oninput=e=>{L[i].u=e.target.value;save()};box.append(n,u);let b=document.createElement("button");b.textContent="Mở";b.onclick=()=>{if(L[i].u)window.open(L[i].u,"_blank")};r.append(box,b);links.append(r)})}
+function updateMail(){let a=bulk.value.trim().split(/\n+/).filter(Boolean).slice(0,10).map(v=>v.split("|")[0].trim());while(a.length<10)a.push("");mails=a;used=Array(10).fill(false);save()}
+function resetUsed(){used=Array(10).fill(false);save()}
 render();
 </script></body></html>
