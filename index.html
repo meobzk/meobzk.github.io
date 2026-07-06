@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -28,15 +27,15 @@ summary{cursor:pointer;font-weight:bold}
 <div class="card">
 <h3>📥 Cập nhật mail</h3>
 <textarea id="bulk" rows="6" placeholder="email@abc.us|password"></textarea><br><br>
-<button onclick="updateMail()">Cập nhật Mail</button>
-<button onclick="resetUsed()">Reset</button>
+<button id="btn-update">Cập nhật Mail</button>
+<button id="btn-reset">Reset</button>
 </div>
 
 <div class="card">
 <h3>🔑 Password chung</h3>
 <input id="pwd" placeholder="Password chung">
 <br><br>
-<button onclick="navigator.clipboard.writeText(pwd.value)">📋 Copy Password</button>
+<button id="btn-copy-pwd">📋 Copy Password</button>
 </div>
 
 <div class="card">
@@ -51,106 +50,156 @@ summary{cursor:pointer;font-weight:bold}
 <textarea id="note" rows="5"></textarea>
 </div>
 
-<script>
-let mails=JSON.parse(localStorage.getItem("mails")||"[]");
-let used=JSON.parse(localStorage.getItem("used")||"[]");
-while(mails.length<10)mails.push("");
-while(used.length<10)used.push(false);
+<!-- Nhúng Firebase SDK sử dụng ES Modules từ CDN -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-let links=JSON.parse(localStorage.getItem("links")||"null");
-if(!links){
- links=[];
- for(let i=1;i<=8;i++) links.push({name:"Link "+i,url:""});
- localStorage.setItem("links",JSON.stringify(links));
+// Cấu hình Firebase thực tế của dự án meobzk của bạn
+const firebaseConfig = {
+    apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
+    authDomain: "meobzk.firebaseapp.com",
+    databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "meobzk",
+    storageBucket: "meobzk.appspot.com",
+    messagingSenderId: "226897249765",
+    appId: "1:226897249765:web:1800a362b02e6d690a1b0c"
+};
+
+// Khởi tạo Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const hubRef = ref(db, 'hub');
+
+let mails = [];
+let used = [];
+let links = [];
+
+// 1. Lắng nghe dữ liệu trực tiếp theo thời gian thực từ Firebase
+onValue(hubRef, (snapshot) => {
+    const data = snapshot.val() || {};
+
+    // Khởi tạo giá trị mặc định nếu database trống
+    mails = data.mails || Array(10).fill("");
+    used = data.used || Array(10).fill(false);
+    links = data.links || Array.from({length: 8}, (_, i) => ({name: "Link " + (i+1), url: ""}));
+
+    // Chỉ cập nhật giá trị nếu người dùng KHÔNG đang gõ vào các ô này (tránh giật con trỏ chuột)
+    if (document.activeElement !== pwd) {
+        pwd.value = data.pwd || "";
+    }
+    if (document.activeElement !== note) {
+        note.value = data.note || "";
+    }
+
+    renderEmails();
+
+    // Chỉ vẽ lại các Link nhanh nếu người dùng không tập trung chỉnh sửa trong vùng Links
+    const activeEl = document.activeElement;
+    const isEditingLinks = activeEl && activeEl.tagName === "INPUT" && activeEl.closest(".linkbox");
+    if (!isEditingLinks) {
+        renderLinks();
+    }
+});
+
+// 2. Các hàm lưu dữ liệu trực tiếp lên Firebase
+function saveMail() {
+    update(hubRef, { mails, used });
 }
 
-pwd.value=localStorage.getItem("pwd")||"";
-note.value=localStorage.getItem("note")||"";
-pwd.oninput=()=>localStorage.setItem("pwd",pwd.value);
-note.oninput=()=>localStorage.setItem("note",note.value);
-
-function saveMail(){
- localStorage.setItem("mails",JSON.stringify(mails));
- localStorage.setItem("used",JSON.stringify(used));
- renderEmails();
+function saveLinks() {
+    update(hubRef, { links });
 }
 
+pwd.oninput = () => {
+    update(hubRef, { pwd: pwd.value });
+};
+
+note.oninput = () => {
+    update(hubRef, { note: note.value });
+};
+
+// 3. Render giao diện Email
 function renderEmails(){
- cnt.textContent="Đã dùng: "+used.filter(x=>x).length+"/10";
- emails.innerHTML="";
- for(let i=0;i<10;i++){
-   let r=document.createElement("div");
-   r.className="row";
-   let d=document.createElement("div");
-   d.className="grow";
-   d.innerHTML="<b>Mail "+(i+1)+"</b><br>"+(mails[i]||"(trống)")+(used[i]?" <span class='used'>✅ Đã dùng</span>":"");
-   let b=document.createElement("button");
-   b.textContent="📋 Copy";
-   b.onclick=()=>{
-      if(mails[i]) navigator.clipboard.writeText(mails[i]);
-      used[i]=!used[i];
-      saveMail();
-   };
-   r.append(d,b);
-   emails.appendChild(r);
- }
+    cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
+    emails.innerHTML = "";
+    for(let i=0; i<10; i++){
+        let r = document.createElement("div");
+        r.className = "row";
+        let d = document.createElement("div");
+        d.className = "grow";
+        d.innerHTML = "<b>Mail " + (i+1) + "</b><br>" + (mails[i] || "(trống)") + (used[i] ? " <span class='used'>✅ Đã dùng</span>" : "");
+        let b = document.createElement("button");
+        b.textContent = "📋 Copy";
+        b.onclick = () => {
+            if(mails[i]) navigator.clipboard.writeText(mails[i]);
+            used[i] = !used[i];
+            saveMail();
+        };
+        r.append(d, b);
+        emails.appendChild(r);
+    }
 }
 
+// 4. Render giao diện Links nhanh
 function renderLinks(){
- const c=document.getElementById("linksContainer");
- c.innerHTML="";
- links.forEach((item,index)=>{
-   const box=document.createElement("div");
-   box.className="linkbox";
+    const c = document.getElementById("linksContainer");
+    c.innerHTML = "";
+    links.forEach((item, index) => {
+        const box = document.createElement("div");
+        box.className = "linkbox";
 
-   const name=document.createElement("input");
-   name.placeholder="Tên";
-   name.value=item.name;
-   name.addEventListener("input",e=>{
-      links[index].name=e.target.value;
-      localStorage.setItem("links",JSON.stringify(links));
-   });
+        const name = document.createElement("input");
+        name.placeholder = "Tên";
+        name.value = item.name;
+        name.addEventListener("input", e => {
+            links[index].name = e.target.value;
+            saveLinks();
+        });
 
-   const url=document.createElement("input");
-   url.placeholder="URL";
-   url.style.marginTop="8px";
-   url.value=item.url;
-   url.addEventListener("input",e=>{
-      links[index].url=e.target.value;
-      localStorage.setItem("links",JSON.stringify(links));
-   });
+        const url = document.createElement("input");
+        url.placeholder = "URL";
+        url.style.marginTop = "8px";
+        url.value = item.url;
+        url.addEventListener("input", e => {
+            links[index].url = e.target.value;
+            saveLinks();
+        });
 
-   const btn=document.createElement("button");
-   btn.style.marginTop="8px";
-   btn.textContent="Mở";
-   btn.onclick=()=>{
-      if(links[index].url.trim()){
-         window.open(links[index].url,"_blank");
-      }
-   };
+        const btn = document.createElement("button");
+        btn.style.marginTop = "8px";
+        btn.textContent = "Mở";
+        btn.onclick = () => {
+            if(links[index].url.trim()){
+                window.open(links[index].url, "_blank");
+            }
+        };
 
-   box.appendChild(name);
-   box.appendChild(url);
-   box.appendChild(btn);
-   c.appendChild(box);
- });
+        box.appendChild(name);
+        box.appendChild(url);
+        box.appendChild(btn);
+        c.appendChild(box);
+    });
 }
 
-function updateMail(){
- let arr=bulk.value.trim().split(/\n+/).filter(Boolean).slice(0,10).map(v=>v.split("|")[0].trim());
- while(arr.length<10) arr.push("");
- mails=arr;
- used=Array(10).fill(false);
- saveMail();
-}
+// 5. Các sự kiện cập nhật hàng loạt danh sách Mail
+document.getElementById("btn-update").onclick = () => {
+    let arr = bulk.value.trim().split(/\n+/).filter(Boolean).slice(0, 10).map(v => v.split("|")[0].trim());
+    while(arr.length < 10) arr.push("");
+    mails = arr;
+    used = Array(10).fill(false);
+    saveMail();
+    bulk.value = ""; // Xóa dữ liệu khung nhập sau khi cập nhật thành công
+};
 
-function resetUsed(){
- used=Array(10).fill(false);
- saveMail();
-}
+document.getElementById("btn-reset").onclick = () => {
+    used = Array(10).fill(false);
+    saveMail();
+};
 
-renderEmails();
-renderLinks();
+document.getElementById("btn-copy-pwd").onclick = () => {
+    navigator.clipboard.writeText(pwd.value);
+};
 </script>
 
 </body>
