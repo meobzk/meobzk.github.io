@@ -1,95 +1,75 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2299.77">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Arial; color: #c9c4bd; -webkit-text-stroke: #c9c4bd; background-color: #131415}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Arial; color: #c9c4bd; -webkit-text-stroke: #c9c4bd; background-color: #131415; min-height: 11.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Arial; color: #468fed; -webkit-text-stroke: #468fed; background-color: #131415}
-    span.s1 {font-kerning: none}
-    span.s2 {font-kerning: none; color: #c9c4bd; -webkit-text-stroke: 0px #c9c4bd}
-    span.s3 {text-decoration: underline ; font-kerning: none; color: #468fed; -webkit-text-stroke: 0px #468fed}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase x GitHub Pages</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f7f6; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; font-size: 16px; margin: 10px 0; width: 80%; border-radius: 4px; border: 1px solid #ccc; }
+        button { background-color: #0288d1; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #01579b; }
+        #data-display { font-weight: bold; color: #ff9900; font-size: 22px; margin-top: 20px; min-height: 30px; }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="vi"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;title&gt;Firebase x GitHub Pages&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;style&gt;</span></p>
-<p class="p1"><span class="s1">        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f7f6; }</span></p>
-<p class="p1"><span class="s1">        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }</span></p>
-<p class="p1"><span class="s1">        input, button { padding: 10px; font-size: 16px; margin: 10px 0; width: 80%; border-radius: 4px; border: 1px solid #ccc; }</span></p>
-<p class="p1"><span class="s1">        button { background-color: #0288d1; color: white; border: none; cursor: pointer; font-weight: bold; }</span></p>
-<p class="p1"><span class="s1">        button:hover { background-color: #01579b; }</span></p>
-<p class="p1"><span class="s1">        #data-display { font-weight: bold; color: #ff9900; font-size: 22px; margin-top: 20px; min-height: 30px; }</span></p>
-<p class="p1"><span class="s1">    &lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">    &lt;div class="container"&gt;</span></p>
-<p class="p1"><span class="s1">        &lt;h2&gt;Kết nối Realtime Database&lt;/h2&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        &lt;input type="text" id="input-data" placeholder="Nhập dữ liệu mới..."&gt;</span></p>
-<p class="p1"><span class="s1">        &lt;button id="btn-send"&gt;Gửi lên Firebase&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        &lt;hr&gt;</span></p>
-<p class="p1"><span class="s1">        &lt;p&gt;Dữ liệu hiện tại trên Database:&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1">        &lt;div id="data-display"&gt;Đang tải dữ liệu...&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">    &lt;!-- Nhúng Firebase SDK sử dụng ES Modules từ CDN --&gt;</span></p>
-<p class="p1"><span class="s1">    &lt;script type="module"&gt;</span></p>
-<p class="p3"><span class="s2">        import { initializeApp } from "<a href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"><span class="s3">https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js</span></a>";</span></p>
-<p class="p3"><span class="s2">        import { getDatabase, ref, set, onValue } from "<a href="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"><span class="s3">https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js</span></a>";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        // Cấu hình Firebase của dự án meobzk</span></p>
-<p class="p1"><span class="s1">        const firebaseConfig = {</span></p>
-<p class="p1"><span class="s1">            apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",</span></p>
-<p class="p1"><span class="s1">            authDomain: "<a href="http://meobzk.firebaseapp.com/"><span class="s3">meobzk.firebaseapp.com</span></a>",</span></p>
-<p class="p3"><span class="s2">            databaseURL: "<a href="https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app/"><span class="s3">https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app</span></a>",</span></p>
-<p class="p1"><span class="s1">            projectId: "meobzk",</span></p>
-<p class="p1"><span class="s1">            storageBucket: "<a href="http://meobzk.appspot.com/"><span class="s3">meobzk.appspot.com</span></a>",</span></p>
-<p class="p1"><span class="s1">            messagingSenderId: "226897249765",</span></p>
-<p class="p1"><span class="s1">            appId: "1:226897249765:web:1800a362b02e6d690a1b0c"</span></p>
-<p class="p1"><span class="s1">        };</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        // Khởi tạo Firebase ứng dụng Web</span></p>
-<p class="p1"><span class="s1">        const app = initializeApp(firebaseConfig);</span></p>
-<p class="p1"><span class="s1">        const db = getDatabase(app);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        // Tạo tham chiếu đến một thư mục tên là 'message' trên Database</span></p>
-<p class="p1"><span class="s1">        const dbRef = ref(db, 'message');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        // 1. Lắng nghe thay đổi dữ liệu thời gian thực (Read)</span></p>
-<p class="p1"><span class="s1">        onValue(dbRef, (snapshot) =&gt; {</span></p>
-<p class="p1"><span class="s1">            const data = snapshot.val();</span></p>
-<p class="p1"><span class="s1">            document.getElementById('data-display').innerText = data ? data : "Chưa có dữ liệu";</span></p>
-<p class="p1"><span class="s1">        });</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">        // 2. Gửi dữ liệu mới lên khi người dùng nhấn nút (Write)</span></p>
-<p class="p1"><span class="s1">        document.getElementById('btn-send').addEventListener('click', () =&gt; {</span></p>
-<p class="p1"><span class="s1">            const inputValue = document.getElementById('input-data').value;</span></p>
-<p class="p1"><span class="s1">            if (inputValue.trim() !== "") {</span></p>
-<p class="p1"><span class="s1">                set(dbRef, inputValue)</span></p>
-<p class="p1"><span class="s1">                    .then(() =&gt; {</span></p>
-<p class="p1"><span class="s1">                        alert("Cập nhật dữ liệu thành công!");</span></p>
-<p class="p1"><span class="s1">                        document.getElementById('input-data').value = "";</span></p>
-<p class="p1"><span class="s1">                    })</span></p>
-<p class="p1"><span class="s1">                    .catch((error) =&gt; {</span></p>
-<p class="p1"><span class="s1">                        console.error("Lỗi khi ghi dữ liệu: ", error);</span></p>
-<p class="p1"><span class="s1">                        alert("Gặp lỗi, vui lòng kiểm tra Security Rules!");</span></p>
-<p class="p1"><span class="s1">                    });</span></p>
-<p class="p1"><span class="s1">            }</span></p>
-<p class="p1"><span class="s1">        });</span></p>
-<p class="p1"><span class="s1">    &lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+
+    <div class="container">
+        <h2>Kết nối Realtime Database</h2>
+
+        <input type="text" id="input-data" placeholder="Nhập dữ liệu mới...">
+        <button id="btn-send">Gửi lên Firebase</button>
+
+        <hr>
+        <p>Dữ liệu hiện tại trên Database:</p>
+        <div id="data-display">Đang tải dữ liệu...</div>
+    </div>
+
+    <!-- Nhúng Firebase SDK sử dụng ES Modules từ CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Cấu hình Firebase của dự án meobzk
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
+            authDomain: "meobzk.firebaseapp.com",
+            databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "meobzk",
+            storageBucket: "meobzk.appspot.com",
+            messagingSenderId: "226897249765",
+            appId: "1:226897249765:web:1800a362b02e6d690a1b0c"
+        };
+
+        // Khởi tạo Firebase ứng dụng Web
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Tạo tham chiếu đến một thư mục tên là 'message' trên Database
+        const dbRef = ref(db, 'message');
+
+        // 1. Lắng nghe thay đổi dữ liệu thời gian thực (Read)
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('data-display').innerText = data ? data : "Chưa có dữ liệu";
+        });
+
+        // 2. Gửi dữ liệu mới lên khi người dùng nhấn nút (Write)
+        document.getElementById('btn-send').addEventListener('click', () => {
+            const inputValue = document.getElementById('input-data').value;
+            if (inputValue.trim() !== "") {
+                set(dbRef, inputValue)
+                    .then(() => {
+                        alert("Cập nhật dữ liệu thành công!");
+                        document.getElementById('input-data').value = "";
+                    })
+                    .catch((error) => {
+                        console.error("Lỗi khi ghi dữ liệu: ", error);
+                        alert("Gặp lỗi, vui lòng kiểm tra Security Rules!");
+                    });
+            }
+        });
+    </script>
 </body>
 </html>
