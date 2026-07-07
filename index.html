@@ -130,7 +130,7 @@ function renderEmails(){
         d.className = "grow";
         d.innerHTML = "<b>Mail " + (i+1) + "</b><br>" + (mails[i] || "(trống)") + (used[i] ? " <span class='used'>✅ Đã dùng</span>" : "");
         let b = document.createElement("button");
-        b.textContent = "📋 Copy";
+        b.textContent = "Copy";
         b.onclick = () => {
             if(mails[i]) navigator.clipboard.writeText(mails[i]);
             used[i] = !used[i];
