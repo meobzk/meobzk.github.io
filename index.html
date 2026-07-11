@@ -15,7 +15,7 @@ button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px
 .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
 summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
 .acc-input-pass{width:80px} 
-.num-label{width:30px;font-size:12px;color:#666}
+.num-label{width:30px;font-size:12px;color:#666;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -29,15 +29,15 @@ summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-r
 <div class="card">
 <h3>📥 Cập nhật mail</h3>
 <textarea id="bulk" rows="6" placeholder="email@abc.us|password"></textarea><br><br>
-<button onclick="updateMail()">Cập nhật Mail</button>
-<button onclick="resetUsed()">Reset</button>
+<button id="btn-update">Cập nhật Mail</button>
+<button id="btn-reset">Reset</button>
 </div>
 
 <div class="card">
 <h3>🔑 Password chung</h3>
 <input id="pwd" placeholder="Password chung">
 <br><br>
-<button onclick="navigator.clipboard.writeText(pwd.value)">📋 Copy Password</button>
+<button id="btn-copy-pwd">📋 Copy Password</button>
 </div>
 
 <div class="card">
@@ -59,133 +59,110 @@ summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-r
 <textarea id="note" rows="5"></textarea>
 </div>
 
-<script>
-// --- Khởi tạo dữ liệu ---
-let mails = JSON.parse(localStorage.getItem("mails") || "[]");
-let used = JSON.parse(localStorage.getItem("used") || "[]");
-while(mails.length < 10) mails.push("");
-while(used.length < 10) used.push(false);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-let links = JSON.parse(localStorage.getItem("links") || "null");
-if(!links){
- links = Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
- localStorage.setItem("links", JSON.stringify(links));
-}
+const firebaseConfig = {
+    apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
+    authDomain: "meobzk.firebaseapp.com",
+    databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "meobzk",
+    storageBucket: "meobzk.appspot.com",
+    messagingSenderId: "226897249765",
+    appId: "1:226897249765:web:1800a362b02e6d690a1b0c"
+};
 
-let accounts = JSON.parse(localStorage.getItem("accounts") || "null");
-if(!accounts){
- accounts = Array.from({length: 150}, () => ({name: "", pass: ""}));
- localStorage.setItem("accounts", JSON.stringify(accounts));
-}
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const hubRef = ref(db, 'hub');
 
-// --- Logic giao diện ---
-pwd.value = localStorage.getItem("pwd") || "";
-note.value = localStorage.getItem("note") || "";
-pwd.oninput = () => localStorage.setItem("pwd", pwd.value);
-note.oninput = () => localStorage.setItem("note", note.value);
+let mails = [], used = [], links = [], accounts = [];
 
-function saveMail(){
- localStorage.setItem("mails", JSON.stringify(mails));
- localStorage.setItem("used", JSON.stringify(used));
- renderEmails();
+onValue(hubRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    mails = data.mails || Array(10).fill("");
+    used = data.used || Array(10).fill(false);
+    links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
+    accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: ""}));
+    
+    if (document.activeElement !== pwd) pwd.value = data.pwd || "";
+    if (document.activeElement !== note) note.value = data.note || "";
+    
+    renderAll();
+});
+
+function saveData(obj) { update(hubRef, obj); }
+
+function renderAll() {
+    renderEmails();
+    renderLinks();
+    renderAccounts();
 }
 
 function renderEmails(){
- cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
- emails.innerHTML = "";
- for(let i=0; i<10; i++){
-   let r = document.createElement("div");
-   r.className = "row";
-   let d = document.createElement("div");
-   d.className = "grow";
-   d.innerHTML = "<b>Mail "+(i+1)+"</b><br>"+(mails[i]||"(trống)")+(used[i]?" <span class='used'>✅</span>":"");
-   let b = document.createElement("button");
-   b.textContent = "📋 Copy";
-   b.onclick = () => {
-      if(mails[i]) navigator.clipboard.writeText(mails[i]);
-      used[i] = !used[i];
-      saveMail();
-   };
-   r.append(d, b);
-   emails.appendChild(r);
- }
+    cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
+    emails.innerHTML = "";
+    mails.forEach((m, i) => {
+        let r = document.createElement("div");
+        r.className = "row";
+        r.innerHTML = `<div class='grow'><b>Mail ${i+1}</b><br>${m||"(trống)"}${used[i]?" <span class='used'>✅</span>":""}</div>`;
+        let b = document.createElement("button");
+        b.textContent = "Copy";
+        b.onclick = () => { if(m) navigator.clipboard.writeText(m); used[i] = !used[i]; saveData({used}); };
+        r.appendChild(b);
+        emails.appendChild(r);
+    });
 }
 
 function renderLinks(){
- const c = document.getElementById("linksContainer");
- c.innerHTML = "";
- links.forEach((item, index) => {
-   const box = document.createElement("div");
-   box.className = "linkbox";
-   const name = document.createElement("input");
-   name.value = item.name;
-   name.oninput = (e) => { links[index].name = e.target.value; localStorage.setItem("links", JSON.stringify(links)); };
-   const url = document.createElement("input");
-   url.style.marginTop = "8px";
-   url.value = item.url;
-   url.oninput = (e) => { links[index].url = e.target.value; localStorage.setItem("links", JSON.stringify(links)); };
-   const btn = document.createElement("button");
-   btn.style.marginTop = "8px";
-   btn.textContent = "Mở";
-   btn.onclick = () => { if(links[index].url.trim()) window.open(links[index].url, "_blank"); };
-   box.append(name, url, btn);
-   c.appendChild(box);
- });
+    const c = document.getElementById("linksContainer");
+    c.innerHTML = "";
+    links.forEach((item, i) => {
+        const box = document.createElement("div");
+        box.className = "linkbox";
+        const name = document.createElement("input"); name.value = item.name;
+        name.oninput = (e) => { links[i].name = e.target.value; saveData({links}); };
+        const url = document.createElement("input"); url.style.marginTop="8px"; url.value = item.url;
+        url.oninput = (e) => { links[i].url = e.target.value; saveData({links}); };
+        box.append(name, url);
+        c.appendChild(box);
+    });
 }
 
 function renderAccounts(){
- const container = document.getElementById("accContainer");
- container.innerHTML = "";
- for(let i=0; i<150; i++){
-    let div = document.createElement("div");
-    div.className = "row";
-    
-    let num = document.createElement("span");
-    num.className = "num-label";
-    num.textContent = (i+1);
+    const container = document.getElementById("accContainer");
+    container.innerHTML = "";
+    for(let i=0; i<150; i++){
+        let div = document.createElement("div");
+        div.className = "row";
+        
+        let num = document.createElement("span"); num.className = "num-label"; num.textContent = (i+1);
+        let nameInp = document.createElement("input"); nameInp.placeholder = "Tên"; nameInp.className = "grow"; nameInp.value = accounts[i].name;
+        nameInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
+        let btn1 = document.createElement("button"); btn1.textContent = "📋"; btn1.onclick = () => navigator.clipboard.writeText(accounts[i].name);
+        
+        let passInp = document.createElement("input"); passInp.placeholder = "Pass"; passInp.className = "acc-input-pass"; passInp.value = accounts[i].pass;
+        passInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
+        let btn2 = document.createElement("button"); btn2.textContent = "📋"; btn2.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
 
-    let nameInp = document.createElement("input");
-    nameInp.placeholder = "Tên";
-    nameInp.value = accounts[i].name;
-    nameInp.className = "grow";
-    nameInp.oninput = (e) => { accounts[i].name = e.target.value; localStorage.setItem("accounts", JSON.stringify(accounts)); };
-
-    let btnCopyName = document.createElement("button");
-    btnCopyName.textContent = "📋";
-    btnCopyName.onclick = () => navigator.clipboard.writeText(accounts[i].name);
-
-    let passInp = document.createElement("input");
-    passInp.placeholder = "Pass";
-    passInp.value = accounts[i].pass;
-    passInp.className = "acc-input-pass";
-    passInp.oninput = (e) => { accounts[i].pass = e.target.value; localStorage.setItem("accounts", JSON.stringify(accounts)); };
-
-    let btnCopyPass = document.createElement("button");
-    btnCopyPass.textContent = "📋";
-    btnCopyPass.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
-
-    div.append(num, nameInp, btnCopyName, passInp, btnCopyPass);
-    container.appendChild(div);
- }
+        div.append(num, nameInp, btn1, passInp, btn2);
+        container.appendChild(div);
+    }
 }
 
-function updateMail(){
- let arr = bulk.value.trim().split(/\n+/).filter(Boolean).slice(0,10).map(v => v.split("|")[0].trim());
- while(arr.length < 10) arr.push("");
- mails = arr;
- used = Array(10).fill(false);
- saveMail();
-}
-
-function resetUsed(){
- used = Array(10).fill(false);
- saveMail();
-}
-
-// Chạy lần đầu
-renderEmails();
-renderLinks();
-renderAccounts();
+// Event Listeners
+document.getElementById("btn-update").onclick = () => {
+    let arr = bulk.value.trim().split(/\n+/).map(v => v.split("|")[0].trim());
+    mails = [...arr, ...Array(10).fill("")].slice(0, 10);
+    used = Array(10).fill(false);
+    saveData({mails, used});
+    bulk.value = "";
+};
+document.getElementById("btn-reset").onclick = () => saveData({used: Array(10).fill(false)});
+document.getElementById("btn-copy-pwd").onclick = () => navigator.clipboard.writeText(pwd.value);
+pwd.oninput = () => saveData({pwd: pwd.value});
+note.oninput = () => saveData({note: note.value});
 </script>
 </body>
 </html>
