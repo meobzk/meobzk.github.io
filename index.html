@@ -7,13 +7,14 @@
 <style>
 body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}
 .card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
-.row{display:flex;gap:8px;align-items:flex-start;margin:10px 0}
+.row{display:flex;gap:6px;align-items:center;margin:6px 0}
 .grow{flex:1}
-input,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid #ccc;border-radius:8px}
-button{background:#1677ff;color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
-.used{color:green;font-weight:bold}
+input{padding:8px;border:1px solid #ccc;border-radius:6px}
+button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer}
+.check-btn{width:40px;background:#eee;color:#333}
+.checked{background:#28a745;color:#fff}
 .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
-summary{cursor:pointer;font-weight:bold}
+summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
 </style>
 </head>
 <body>
@@ -25,17 +26,9 @@ summary{cursor:pointer;font-weight:bold}
 </div>
 
 <div class="card">
-<h3>📥 Cập nhật mail</h3>
-<textarea id="bulk" rows="6" placeholder="email@abc.us|password"></textarea><br><br>
-<button id="btn-update">Cập nhật Mail</button>
-<button id="btn-reset">Reset</button>
-</div>
-
-<div class="card">
-<h3>🔑 Password chung</h3>
-<input id="pwd" placeholder="Password chung">
-<br><br>
-<button id="btn-copy-pwd">📋 Copy Password</button>
+<h3>👤 150 Account</h3>
+<button id="btn-reset-acc" style="background:#ff4d4f;width:100%;margin-bottom:10px;">Reset tất cả dấu tích ✅</button>
+<div id="accContainer"></div>
 </div>
 
 <div class="card">
@@ -45,86 +38,59 @@ summary{cursor:pointer;font-weight:bold}
 </details>
 </div>
 
-<div class="card">
-<h3>📝 Ghi chú</h3>
-<textarea id="note" rows="5"></textarea>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// CẤU HÌNH CỦA BẠN (Đã lấy từ code trước của bạn)
 const firebaseConfig = {
     apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
-    authDomain: "meobzk.firebaseapp.com",
     databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "meobzk",
-    storageBucket: "meobzk.appspot.com",
-    messagingSenderId: "226897249765",
-    appId: "1:226897249765:web:1800a362b02e6d690a1b0c"
+    projectId: "meobzk"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const hubRef = ref(db, 'hub');
 
-let mails = [], used = [], links = [];
+let accounts = [];
 
-// 1. Lắng nghe dữ liệu thời gian thực từ Firebase
+// Lắng nghe dữ liệu từ Firebase
 onValue(hubRef, (snapshot) => {
     const data = snapshot.val() || {};
-    mails = data.mails || Array(10).fill("");
-    used = data.used || Array(10).fill(false);
-    links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
-    
-    // Cập nhật giá trị ô input nếu người dùng không đang gõ
-    if(document.activeElement !== pwd) pwd.value = data.pwd || "";
-    if(document.activeElement !== note) note.value = data.note || "";
-    
-    renderEmails();
-    renderLinks();
+    accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
+    renderAccounts();
 });
 
-// 2. Các hàm lưu dữ liệu lên Firebase
-function saveAll(obj) { update(hubRef, obj); }
+function saveData(obj) { update(hubRef, obj); }
 
-// 3. Render các thành phần
-function renderEmails(){
-    cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
-    emails.innerHTML = "";
-    mails.forEach((m, i) => {
-        let r = document.createElement("div"); r.className = "row";
-        r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b><br>${m||"(trống)"}${used[i]?" <span class='used'>✅ Đã dùng</span>":""}</div>`;
-        let b = document.createElement("button"); b.textContent = "Copy";
-        b.onclick = () => { if(m) navigator.clipboard.writeText(m); used[i] = !used[i]; saveAll({used}); };
-        r.appendChild(b); emails.appendChild(r);
+function renderAccounts(){
+    const container = document.getElementById("accContainer");
+    container.innerHTML = "";
+    accounts.forEach((acc, i) => {
+        let div = document.createElement("div"); div.className = "row";
+        
+        let label = document.createElement("span"); label.textContent = (i+1); label.style.width="25px";
+        
+        let nameInp = document.createElement("input"); nameInp.className = "grow"; nameInp.value = acc.name;
+        nameInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
+        
+        let passInp = document.createElement("input"); passInp.style.width="70px"; passInp.value = acc.pass;
+        passInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
+        
+        let cBtn = document.createElement("button"); 
+        cBtn.className = "check-btn " + (acc.checked ? "checked" : "");
+        cBtn.textContent = "✅";
+        cBtn.onclick = () => { accounts[i].checked = !accounts[i].checked; saveData({accounts}); };
+        
+        div.append(label, nameInp, passInp, cBtn);
+        container.appendChild(div);
     });
 }
 
-function renderLinks(){
-    const c = document.getElementById("linksContainer");
-    c.innerHTML = "";
-    links.forEach((item, i) => {
-        const box = document.createElement("div"); box.className = "linkbox";
-        const n = document.createElement("input"); n.value = item.name; n.oninput = (e) => { links[i].name = e.target.value; saveAll({links}); };
-        const u = document.createElement("input"); u.style.marginTop="8px"; u.value = item.url; u.oninput = (e) => { links[i].url = e.target.value; saveAll({links}); };
-        box.append(n, u); c.appendChild(box);
-    });
-}
-
-// 4. Sự kiện
-document.getElementById("btn-update").onclick = () => {
-    let arr = bulk.value.trim().split(/\n+/).map(v => v.split("|")[0].trim());
-    while(arr.length < 10) arr.push("");
-    saveAll({mails: arr, used: Array(10).fill(false)});
-    bulk.value = "";
+document.getElementById("btn-reset-acc").onclick = () => {
+    accounts.forEach(a => a.checked = false);
+    saveData({accounts});
 };
-document.getElementById("btn-reset").onclick = () => saveAll({used: Array(10).fill(false)});
-document.getElementById("btn-copy-pwd").onclick = () => navigator.clipboard.writeText(pwd.value);
-pwd.oninput = () => saveAll({pwd: pwd.value});
-note.oninput = () => saveAll({note: note.value});
 </script>
-
 </body>
 </html>
