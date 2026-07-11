@@ -11,8 +11,8 @@ body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16
 .grow{flex:1}
 input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
 button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer;white-space:nowrap}
-.check-btn{background:#f0f0f0;color:#333;font-weight:bold;width:40px}
-.checked{background:#d4edda;color:#155724}
+.check-btn{background:#f0f0f0;color:#ccc;font-weight:bold;width:45px}
+.checked{background:#d4edda;color:#155724;border:1px solid #155724}
 .used{color:green;font-weight:bold}
 .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
 summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
@@ -53,7 +53,7 @@ summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-r
 <details>
 <summary>👤 150 Account</summary>
 <div style="margin:10px 0;">
-    <button id="btn-reset-acc" style="background:#ff4d4f;">Reset tất cả dấu tích ✅</button>
+    <button id="btn-reset-acc" style="background:#ff4d4f; width:100%;">Reset tất cả dấu tích ✅</button>
 </div>
 <div id="accContainer" style="margin-top:10px;"></div>
 </details>
@@ -96,20 +96,14 @@ onValue(hubRef, (snapshot) => {
     if (document.activeElement !== pwd) pwd.value = data.pwd || "";
     if (document.activeElement !== note) note.value = data.note || "";
     
+    renderAll();
+});
+
+function renderAll(){
     renderEmails();
     renderLinks();
-    
-    const accContainer = document.getElementById("accContainer");
-    if (accContainer.innerHTML === "") renderAccounts();
-    else {
-        accounts.forEach((acc, i) => {
-            const n = document.getElementById(`name-${i}`), p = document.getElementById(`pass-${i}`), c = document.getElementById(`check-${i}`);
-            if (n && document.activeElement !== n) n.value = acc.name;
-            if (p && document.activeElement !== p) p.value = acc.pass;
-            if (c) c.className = "check-btn " + (acc.checked ? "checked" : "");
-        });
-    }
-});
+    renderAccounts();
+}
 
 function renderEmails(){
     cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
@@ -125,7 +119,7 @@ function renderEmails(){
 
 function renderLinks(){
     const c = document.getElementById("linksContainer");
-    if(c.innerHTML !== "") return;
+    c.innerHTML = "";
     links.forEach((item, i) => {
         const box = document.createElement("div"); box.className = "linkbox";
         const n = document.createElement("input"); n.value = item.name; n.oninput = (e) => { links[i].name = e.target.value; saveData({links}); };
@@ -140,18 +134,27 @@ function renderAccounts(){
     for(let i=0; i<150; i++){
         let div = document.createElement("div"); div.className = "row";
         let num = document.createElement("span"); num.className = "num-label"; num.textContent = (i+1);
-        let nInp = document.createElement("input"); nInp.id = `name-${i}`; nInp.placeholder = "Tên"; nInp.className = "grow"; nInp.value = accounts[i].name;
+        
+        let nInp = document.createElement("input"); nInp.placeholder = "Tên"; nInp.className = "grow"; nInp.value = accounts[i].name || "";
         nInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
-        let b1 = document.createElement("button"); b1.textContent = "📋"; b1.onclick = () => navigator.clipboard.writeText(accounts[i].name);
-        let pInp = document.createElement("input"); pInp.id = `pass-${i}`; pInp.placeholder = "Pass"; pInp.className = "acc-input-pass"; pInp.value = accounts[i].pass;
+        
+        let b1 = document.createElement("button"); b1.textContent = "📋"; b1.onclick = () => navigator.clipboard.writeText(accounts[i].name || "");
+        
+        let pInp = document.createElement("input"); pInp.placeholder = "Pass"; pInp.className = "acc-input-pass"; pInp.value = accounts[i].pass || "";
         pInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
-        let b2 = document.createElement("button"); b2.textContent = "📋"; b2.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
         
-        let cBtn = document.createElement("button"); cBtn.id = `check-${i}`; cBtn.className = "check-btn " + (accounts[i].checked ? "checked" : "");
+        let b2 = document.createElement("button"); b2.textContent = "📋"; b2.onclick = () => navigator.clipboard.writeText(accounts[i].pass || "");
+        
+        let cBtn = document.createElement("button"); 
+        cBtn.className = "check-btn " + (accounts[i].checked ? "checked" : "");
         cBtn.textContent = "✅";
-        cBtn.onclick = () => { accounts[i].checked = !accounts[i].checked; saveData({accounts}); };
+        cBtn.onclick = () => { 
+            accounts[i].checked = !accounts[i].checked; 
+            saveData({accounts});
+        };
         
-        div.append(num, nInp, b1, pInp, b2, cBtn); container.appendChild(div);
+        div.append(num, nInp, b1, pInp, b2, cBtn);
+        container.appendChild(div);
     }
 }
 
