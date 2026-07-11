@@ -7,13 +7,14 @@
 <style>
 body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}
 .card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
-.row{display:flex;gap:8px;align-items:flex-start;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;margin:6px 0}
 .grow{flex:1}
-input,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid #ccc;border-radius:8px}
-button{background:#1677ff;color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
+input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
+button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 12px;cursor:pointer}
 .used{color:green;font-weight:bold}
 .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
-summary{cursor:pointer;font-weight:bold}
+summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
+.acc-input{width:100px} /* Chiều rộng cố định cho ô pass */
 </style>
 </head>
 <body>
@@ -25,10 +26,17 @@ summary{cursor:pointer;font-weight:bold}
 </div>
 
 <div class="card">
-<h3>📥 Cập nhật mail</h3>
-<textarea id="bulk" rows="6" placeholder="email@abc.us|password"></textarea><br><br>
-<button id="btn-update">Cập nhật Mail</button>
-<button id="btn-reset">Reset</button>
+<details>
+<summary>🔗 8 Link nhanh</summary>
+<div id="linksContainer"></div>
+</details>
+</div>
+
+<div class="card">
+<details>
+<summary>👤 150 Account</summary>
+<div id="accContainer" style="margin-top:10px;"></div>
+</details>
 </div>
 
 <div class="card">
@@ -38,24 +46,10 @@ summary{cursor:pointer;font-weight:bold}
 <button id="btn-copy-pwd">📋 Copy Password</button>
 </div>
 
-<div class="card">
-<details>
-<summary>🔗 8 Link nhanh</summary>
-<div id="linksContainer"></div>
-</details>
-</div>
-
-<div class="card">
-<h3>📝 Ghi chú</h3>
-<textarea id="note" rows="5"></textarea>
-</div>
-
-<!-- Nhúng Firebase SDK sử dụng ES Modules từ CDN -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Cấu hình Firebase thực tế của dự án meobzk của bạn
 const firebaseConfig = {
     apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
     authDomain: "meobzk.firebaseapp.com",
@@ -66,141 +60,53 @@ const firebaseConfig = {
     appId: "1:226897249765:web:1800a362b02e6d690a1b0c"
 };
 
-// Khởi tạo Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const hubRef = ref(db, 'hub');
 
-let mails = [];
-let used = [];
-let links = [];
+let accounts = Array.from({length: 150}, () => ({name: "", pass: ""}));
 
-// 1. Lắng nghe dữ liệu trực tiếp theo thời gian thực từ Firebase
 onValue(hubRef, (snapshot) => {
     const data = snapshot.val() || {};
-
-    // Khởi tạo giá trị mặc định nếu database trống
-    mails = data.mails || Array(10).fill("");
-    used = data.used || Array(10).fill(false);
-    links = data.links || Array.from({length: 8}, (_, i) => ({name: "Link " + (i+1), url: ""}));
-
-    // Chỉ cập nhật giá trị nếu người dùng KHÔNG đang gõ vào các ô này (tránh giật con trỏ chuột)
-    if (document.activeElement !== pwd) {
-        pwd.value = data.pwd || "";
-    }
-    if (document.activeElement !== note) {
-        note.value = data.note || "";
-    }
-
-    renderEmails();
-
-    // Chỉ vẽ lại các Link nhanh nếu người dùng không tập trung chỉnh sửa trong vùng Links
-    const activeEl = document.activeElement;
-    const isEditingLinks = activeEl && activeEl.tagName === "INPUT" && activeEl.closest(".linkbox");
-    if (!isEditingLinks) {
-        renderLinks();
-    }
+    if(data.accounts) accounts = data.accounts;
+    renderAccounts();
 });
 
-// 2. Các hàm lưu dữ liệu trực tiếp lên Firebase
-function saveMail() {
-    update(hubRef, { mails, used });
+function saveAccs() {
+    update(hubRef, { accounts });
 }
 
-function saveLinks() {
-    update(hubRef, { links });
-}
+function renderAccounts(){
+    const container = document.getElementById("accContainer");
+    container.innerHTML = "";
+    for(let i=0; i<150; i++){
+        let div = document.createElement("div");
+        div.className = "row";
+        
+        let nameInp = document.createElement("input");
+        nameInp.placeholder = "Tên " + (i+1);
+        nameInp.value = accounts[i].name;
+        nameInp.className = "grow";
+        nameInp.oninput = (e) => { accounts[i].name = e.target.value; saveAccs(); };
 
-pwd.oninput = () => {
-    update(hubRef, { pwd: pwd.value });
-};
+        let btnCopyName = document.createElement("button");
+        btnCopyName.textContent = "📋";
+        btnCopyName.onclick = () => navigator.clipboard.writeText(accounts[i].name);
 
-note.oninput = () => {
-    update(hubRef, { note: note.value });
-};
+        let passInp = document.createElement("input");
+        passInp.placeholder = "Pass";
+        passInp.value = accounts[i].pass;
+        passInp.className = "acc-input";
+        passInp.oninput = (e) => { accounts[i].pass = e.target.value; saveAccs(); };
 
-// 3. Render giao diện Email
-function renderEmails(){
-    cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
-    emails.innerHTML = "";
-    for(let i=0; i<10; i++){
-        let r = document.createElement("div");
-        r.className = "row";
-        let d = document.createElement("div");
-        d.className = "grow";
-        d.innerHTML = "<b>Mail " + (i+1) + "</b><br>" + (mails[i] || "(trống)") + (used[i] ? " <span class='used'>✅ Đã dùng</span>" : "");
-        let b = document.createElement("button");
-        b.textContent = "Copy";
-        b.onclick = () => {
-            if(mails[i]) navigator.clipboard.writeText(mails[i]);
-            used[i] = !used[i];
-            saveMail();
-        };
-        r.append(d, b);
-        emails.appendChild(r);
+        let btnCopyPass = document.createElement("button");
+        btnCopyPass.textContent = "📋";
+        btnCopyPass.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
+
+        div.append(nameInp, btnCopyName, passInp, btnCopyPass);
+        container.appendChild(div);
     }
 }
-
-// 4. Render giao diện Links nhanh
-function renderLinks(){
-    const c = document.getElementById("linksContainer");
-    c.innerHTML = "";
-    links.forEach((item, index) => {
-        const box = document.createElement("div");
-        box.className = "linkbox";
-
-        const name = document.createElement("input");
-        name.placeholder = "Tên";
-        name.value = item.name;
-        name.addEventListener("input", e => {
-            links[index].name = e.target.value;
-            saveLinks();
-        });
-
-        const url = document.createElement("input");
-        url.placeholder = "URL";
-        url.style.marginTop = "8px";
-        url.value = item.url;
-        url.addEventListener("input", e => {
-            links[index].url = e.target.value;
-            saveLinks();
-        });
-
-        const btn = document.createElement("button");
-        btn.style.marginTop = "8px";
-        btn.textContent = "Mở";
-        btn.onclick = () => {
-            if(links[index].url.trim()){
-                window.open(links[index].url, "_blank");
-            }
-        };
-
-        box.appendChild(name);
-        box.appendChild(url);
-        box.appendChild(btn);
-        c.appendChild(box);
-    });
-}
-
-// 5. Các sự kiện cập nhật hàng loạt danh sách Mail
-document.getElementById("btn-update").onclick = () => {
-    let arr = bulk.value.trim().split(/\n+/).filter(Boolean).slice(0, 10).map(v => v.split("|")[0].trim());
-    while(arr.length < 10) arr.push("");
-    mails = arr;
-    used = Array(10).fill(false);
-    saveMail();
-    bulk.value = ""; // Xóa dữ liệu khung nhập sau khi cập nhật thành công
-};
-
-document.getElementById("btn-reset").onclick = () => {
-    used = Array(10).fill(false);
-    saveMail();
-};
-
-document.getElementById("btn-copy-pwd").onclick = () => {
-    navigator.clipboard.writeText(pwd.value);
-};
 </script>
-
 </body>
 </html>
