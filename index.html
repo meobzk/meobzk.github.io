@@ -5,37 +5,60 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Android Setup Hub</title>
 <style>
-body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}
-.card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
-.row{display:flex;gap:6px;align-items:center;margin:6px 0}
-.grow{flex:1}
-input{padding:8px;border:1px solid #ccc;border-radius:6px}
-button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer}
-.check-btn{width:40px;background:#eee;color:#333}
-.checked{background:#28a745;color:#fff}
-.linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
-summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
+    body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}
+    .card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
+    .row{display:flex;gap:6px;align-items:center;margin:6px 0}
+    .grow{flex:1}
+    input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
+    button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer;white-space:nowrap}
+    .check-btn{background:#fff;border:1px solid #ccc;width:40px;height:35px;font-size:18px}
+    .checked{background:#d4edda;border-color:#28a745}
+    .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
+    summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
+    .num-label{width:30px;font-size:12px;color:#666}
 </style>
 </head>
 <body>
 
 <div class="card">
-<h2>Android Setup Hub</h2>
-<div id="cnt"></div>
-<div id="emails"></div>
+    <h2>Android Setup Hub</h2>
+    <div id="cnt"></div>
+    <div id="emails"></div>
 </div>
 
 <div class="card">
-<h3>👤 150 Account</h3>
-<button id="btn-reset-acc" style="background:#ff4d4f;width:100%;margin-bottom:10px;">Reset tất cả dấu tích ✅</button>
-<div id="accContainer"></div>
+    <h3>📥 Cập nhật mail</h3>
+    <textarea id="bulk" rows="4" placeholder="email|password"></textarea>
+    <div style="margin-top:10px">
+        <button id="btn-update">Cập nhật Mail</button>
+        <button id="btn-reset-mail" style="background:#666">Reset Mail</button>
+    </div>
 </div>
 
 <div class="card">
-<details>
-<summary>🔗 8 Link nhanh</summary>
-<div id="linksContainer"></div>
-</details>
+    <h3>🔑 Password chung</h3>
+    <input id="pwd" placeholder="Password chung">
+    <button style="margin-top:10px" id="btn-copy-pwd">📋 Copy Password</button>
+</div>
+
+<div class="card">
+    <details>
+        <summary>🔗 8 Link nhanh</summary>
+        <div id="linksContainer"></div>
+    </details>
+</div>
+
+<div class="card">
+    <details>
+        <summary>👤 150 Account</summary>
+        <button id="btn-reset-acc" style="background:#ff4d4f;width:100%;margin:10px 0;">Reset tất cả dấu tích ✅</button>
+        <div id="accContainer"></div>
+    </details>
+</div>
+
+<div class="card">
+    <h3>📝 Ghi chú</h3>
+    <textarea id="note" rows="4"></textarea>
 </div>
 
 <script type="module">
@@ -47,50 +70,64 @@ const firebaseConfig = {
     databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "meobzk"
 };
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getDatabase(initializeApp(firebaseConfig));
 const hubRef = ref(db, 'hub');
 
-let accounts = [];
+let state = { mails:[], used:[], links:[], accounts:[], pwd:"", note:"" };
 
-// Lắng nghe dữ liệu từ Firebase
-onValue(hubRef, (snapshot) => {
-    const data = snapshot.val() || {};
-    accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
-    renderAccounts();
+onValue(hubRef, (snap) => {
+    const data = snap.val() || {};
+    state.mails = data.mails || Array(10).fill("");
+    state.used = data.used || Array(10).fill(false);
+    state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
+    state.accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
+    if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
+    if(document.activeElement.id !== "note") note.value = data.note || "";
+    render();
 });
 
-function saveData(obj) { update(hubRef, obj); }
+function render() {
+    // Render Mail
+    emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
+    state.mails.forEach((m,i) => {
+        let r = document.createElement("div"); r.className = "row";
+        r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b><br>${m||"(trống)"}</div>`;
+        let b = document.createElement("button"); b.textContent = "Copy";
+        b.onclick = () => { if(m) navigator.clipboard.writeText(m); state.used[i] = !state.used[i]; update(hubRef, {used: state.used}); };
+        r.appendChild(b); emails.appendChild(r);
+    });
 
-function renderAccounts(){
-    const container = document.getElementById("accContainer");
-    container.innerHTML = "";
-    accounts.forEach((acc, i) => {
+    // Render Links
+    linksContainer.innerHTML = "";
+    state.links.forEach((l,i) => {
+        let box = document.createElement("div"); box.className = "linkbox";
+        let n = document.createElement("input"); n.value = l.name; n.oninput = (e)=>{state.links[i].name=e.target.value; update(hubRef, {links:state.links});};
+        let u = document.createElement("input"); u.value = l.url; u.style.marginTop="5px"; u.oninput = (e)=>{state.links[i].url=e.target.value; update(hubRef, {links:state.links});};
+        box.append(n, u); linksContainer.appendChild(box);
+    });
+
+    // Render 150 Acc
+    accContainer.innerHTML = "";
+    state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
-        
-        let label = document.createElement("span"); label.textContent = (i+1); label.style.width="25px";
-        
-        let nameInp = document.createElement("input"); nameInp.className = "grow"; nameInp.value = acc.name;
-        nameInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
-        
-        let passInp = document.createElement("input"); passInp.style.width="70px"; passInp.value = acc.pass;
-        passInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
-        
-        let cBtn = document.createElement("button"); 
-        cBtn.className = "check-btn " + (acc.checked ? "checked" : "");
-        cBtn.textContent = "✅";
-        cBtn.onclick = () => { accounts[i].checked = !accounts[i].checked; saveData({accounts}); };
-        
-        div.append(label, nameInp, passInp, cBtn);
-        container.appendChild(div);
+        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.oninput=(e)=>{state.accounts[i].name=e.target.value; update(hubRef, {accounts:state.accounts});};
+        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.oninput=(e)=>{state.accounts[i].pass=e.target.value; update(hubRef, {accounts:state.accounts});};
+        let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
+        c.innerHTML = acc.checked ? "✅" : "";
+        c.onclick = () => { state.accounts[i].checked = !state.accounts[i].checked; update(hubRef, {accounts: state.accounts}); };
+        div.append(document.createElement("span").appendChild(document.createTextNode(i+1)) && document.createElement("span"), n, p, c); // Cấu trúc gọn
+        div.innerHTML = `<span class="num-label">${i+1}</span>` + div.innerHTML;
+        accContainer.appendChild(div);
     });
 }
 
-document.getElementById("btn-reset-acc").onclick = () => {
-    accounts.forEach(a => a.checked = false);
-    saveData({accounts});
-};
+// Events
+btn-update.onclick = () => { state.mails = bulk.value.split("\n").slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
+btn-reset-mail.onclick = () => update(hubRef, {used: Array(10).fill(false)});
+btn-reset-acc.onclick = () => { state.accounts.forEach(a=>a.checked=false); update(hubRef, {accounts: state.accounts}); };
+btn-copy-pwd.onclick = () => navigator.clipboard.writeText(pwd.value);
+pwd.oninput = () => update(hubRef, {pwd: pwd.value});
+note.oninput = () => update(hubRef, {note: note.value});
 </script>
 </body>
 </html>
