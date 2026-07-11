@@ -65,7 +65,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Thay cấu hình Firebase của bạn vào đây
 const firebaseConfig = {
     apiKey: "AIzaSyAXwW5V-Yfs4wVFZpM7Z2uKJQjl_BC5tHw",
     databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -89,7 +88,6 @@ onValue(hubRef, (snap) => {
 });
 
 function render() {
-    // 1. Render Mail
     emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
     state.mails.forEach((m,i) => {
         let r = document.createElement("div"); r.className = "row";
@@ -99,7 +97,6 @@ function render() {
         r.appendChild(b); emails.appendChild(r);
     });
 
-    // 2. Render Links
     linksContainer.innerHTML = "";
     state.links.forEach((l,i) => {
         let box = document.createElement("div"); box.className = "linkbox";
@@ -108,12 +105,11 @@ function render() {
         box.append(n, u); linksContainer.appendChild(box);
     });
 
-    // 3. Render 150 Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
-        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.oninput=(e)=>{state.accounts[i].name=e.target.value; update(hubRef, {accounts:state.accounts});};
-        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.oninput=(e)=>{state.accounts[i].pass=e.target.value; update(hubRef, {accounts:state.accounts});};
+        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; n.oninput=(e)=>{state.accounts[i].name=e.target.value; update(hubRef, {accounts:state.accounts});};
+        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i; p.oninput=(e)=>{state.accounts[i].pass=e.target.value; update(hubRef, {accounts:state.accounts});};
         let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
         c.innerHTML = acc.checked ? "✅" : "";
         c.onclick = () => { state.accounts[i].checked = !state.accounts[i].checked; update(hubRef, {accounts: state.accounts}); };
@@ -123,7 +119,6 @@ function render() {
     });
 }
 
-// Events
 btn_update.onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
 btn_reset_mail.onclick = () => update(hubRef, {used: Array(10).fill(false)});
 btn_reset_acc.onclick = () => { state.accounts.forEach(a=>a.checked=false); update(hubRef, {accounts: state.accounts}); };
