@@ -82,12 +82,15 @@ onValue(hubRef, (snap) => {
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     state.accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
     
+    // Chỉ cập nhật input nếu không đang focus
     if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
     if(document.activeElement.id !== "note") note.value = data.note || "";
+    
     render();
 });
 
 function render() {
+    // 1. Mails
     emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
     state.mails.forEach((m,i) => {
         let r = document.createElement("div"); r.className = "row";
@@ -97,6 +100,7 @@ function render() {
         r.appendChild(b); emails.appendChild(r);
     });
 
+    // 2. Links
     linksContainer.innerHTML = "";
     state.links.forEach((l,i) => {
         let box = document.createElement("div"); box.className = "linkbox";
@@ -105,11 +109,15 @@ function render() {
         box.append(n, u); linksContainer.appendChild(box);
     });
 
+    // 3. Accounts (Tối ưu để không nhảy bàn phím)
+    const activeId = document.activeElement ? document.activeElement.id : null;
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
-        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; n.oninput=(e)=>{state.accounts[i].name=e.target.value; update(hubRef, {accounts:state.accounts});};
-        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i; p.oninput=(e)=>{state.accounts[i].pass=e.target.value; update(hubRef, {accounts:state.accounts});};
+        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; 
+        n.oninput = (e)=>{ state.accounts[i].name = e.target.value; update(hubRef, {accounts:state.accounts}); };
+        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i;
+        p.oninput = (e)=>{ state.accounts[i].pass = e.target.value; update(hubRef, {accounts:state.accounts}); };
         let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
         c.innerHTML = acc.checked ? "✅" : "";
         c.onclick = () => { state.accounts[i].checked = !state.accounts[i].checked; update(hubRef, {accounts: state.accounts}); };
@@ -117,11 +125,20 @@ function render() {
         div.append(n, p, c);
         accContainer.appendChild(div);
     });
+    // Trả lại focus cho ô đang gõ
+    if(activeId) {
+        let el = document.getElementById(activeId);
+        if(el) el.focus();
+    }
 }
 
+// Events
 btn_update.onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
 btn_reset_mail.onclick = () => update(hubRef, {used: Array(10).fill(false)});
-btn_reset_acc.onclick = () => { state.accounts.forEach(a=>a.checked=false); update(hubRef, {accounts: state.accounts}); };
+btn_reset_acc.onclick = () => {
+    let resetAccs = state.accounts.map(a => ({...a, checked: false}));
+    update(hubRef, {accounts: resetAccs});
+};
 btn_copy_pwd.onclick = () => navigator.clipboard.writeText(pwd.value);
 pwd.oninput = () => update(hubRef, {pwd: pwd.value});
 note.oninput = () => update(hubRef, {note: note.value});
