@@ -82,35 +82,34 @@ onValue(hubRef, (snap) => {
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     state.accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
     
-    // Chỉ cập nhật input nếu không đang focus
     if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
     if(document.activeElement.id !== "note") note.value = data.note || "";
-    
     render();
 });
 
 function render() {
-    // 1. Mails
+    const activeId = document.activeElement ? document.activeElement.id : null;
+    
+    // 1. Render Mail
     emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
     state.mails.forEach((m,i) => {
         let r = document.createElement("div"); r.className = "row";
-        r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b><br>${m||"(trống)"}</div>`;
+        r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m||"(trống)"}</div>`;
         let b = document.createElement("button"); b.textContent = "Copy";
-        b.onclick = () => { if(m) navigator.clipboard.writeText(m); state.used[i] = !state.used[i]; update(hubRef, {used: state.used}); };
+        b.onclick = () => { if(m) navigator.clipboard.writeText(m); state.used[i] = true; update(hubRef, {used: state.used}); };
         r.appendChild(b); emails.appendChild(r);
     });
 
-    // 2. Links
+    // 2. Render Links
     linksContainer.innerHTML = "";
     state.links.forEach((l,i) => {
         let box = document.createElement("div"); box.className = "linkbox";
-        let n = document.createElement("input"); n.value = l.name; n.placeholder="Tên"; n.oninput = (e)=>{state.links[i].name=e.target.value; update(hubRef, {links:state.links});};
-        let u = document.createElement("input"); u.value = l.url; u.placeholder="URL"; u.style.marginTop="5px"; u.oninput = (e)=>{state.links[i].url=e.target.value; update(hubRef, {links:state.links});};
+        let n = document.createElement("input"); n.value = l.name; n.id = "ln"+i; n.oninput = (e)=>{state.links[i].name=e.target.value; update(hubRef, {links:state.links});};
+        let u = document.createElement("input"); u.value = l.url; u.id = "lu"+i; u.style.marginTop="5px"; u.oninput = (e)=>{state.links[i].url=e.target.value; update(hubRef, {links:state.links});};
         box.append(n, u); linksContainer.appendChild(box);
     });
 
-    // 3. Accounts (Tối ưu để không nhảy bàn phím)
-    const activeId = document.activeElement ? document.activeElement.id : null;
+    // 3. Render Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -125,19 +124,15 @@ function render() {
         div.append(n, p, c);
         accContainer.appendChild(div);
     });
-    // Trả lại focus cho ô đang gõ
-    if(activeId) {
-        let el = document.getElementById(activeId);
-        if(el) el.focus();
-    }
+
+    if(activeId && document.getElementById(activeId)) document.getElementById(activeId).focus();
 }
 
-// Events
 btn_update.onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
 btn_reset_mail.onclick = () => update(hubRef, {used: Array(10).fill(false)});
 btn_reset_acc.onclick = () => {
-    let resetAccs = state.accounts.map(a => ({...a, checked: false}));
-    update(hubRef, {accounts: resetAccs});
+    let newAccs = state.accounts.map(a => ({...a, checked: false}));
+    update(hubRef, {accounts: newAccs});
 };
 btn_copy_pwd.onclick = () => navigator.clipboard.writeText(pwd.value);
 pwd.oninput = () => update(hubRef, {pwd: pwd.value});
