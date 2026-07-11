@@ -109,19 +109,26 @@ function render() {
         box.append(n, u); linksContainer.appendChild(box);
     });
 
-    // 3. Render Accounts
+    // 3. Render 150 Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
         let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; 
         n.oninput = (e)=>{ state.accounts[i].name = e.target.value; update(hubRef, {accounts:state.accounts}); };
+        
+        let c1 = document.createElement("button"); c1.textContent="📋"; c1.onclick=()=>navigator.clipboard.writeText(acc.name);
+        
         let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i;
         p.oninput = (e)=>{ state.accounts[i].pass = e.target.value; update(hubRef, {accounts:state.accounts}); };
+        
+        let c2 = document.createElement("button"); c2.textContent="📋"; c2.onclick=()=>navigator.clipboard.writeText(acc.pass);
+        
         let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
         c.innerHTML = acc.checked ? "✅" : "";
         c.onclick = () => { state.accounts[i].checked = !state.accounts[i].checked; update(hubRef, {accounts: state.accounts}); };
+        
         div.innerHTML = `<span class="num-label">${i+1}</span>`;
-        div.append(n, p, c);
+        div.append(n, c1, p, c2, c);
         accContainer.appendChild(div);
     });
 
