@@ -79,6 +79,10 @@ const hubRef = ref(db, 'hub');
 
 let mails = [], used = [], links = [], accounts = [];
 
+// Hàm cập nhật Firebase
+function saveData(obj) { update(hubRef, obj); }
+
+// Lắng nghe dữ liệu
 onValue(hubRef, (snapshot) => {
     const data = snapshot.val() || {};
     mails = data.mails || Array(10).fill("");
@@ -86,47 +90,46 @@ onValue(hubRef, (snapshot) => {
     links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: ""}));
     
+    // Cập nhật các ô đơn lẻ nếu không được focus
     if (document.activeElement !== pwd) pwd.value = data.pwd || "";
     if (document.activeElement !== note) note.value = data.note || "";
     
-    renderAll();
-});
-
-function saveData(obj) { update(hubRef, obj); }
-
-function renderAll() {
     renderEmails();
     renderLinks();
-    renderAccounts();
-}
+    
+    // Cập nhật danh sách 150 acc thông minh (không làm mất focus)
+    const accContainer = document.getElementById("accContainer");
+    if (accContainer.innerHTML === "") {
+        renderAccounts();
+    } else {
+        accounts.forEach((acc, i) => {
+            const n = document.getElementById(`name-${i}`), p = document.getElementById(`pass-${i}`);
+            if (n && document.activeElement !== n) n.value = acc.name;
+            if (p && document.activeElement !== p) p.value = acc.pass;
+        });
+    }
+});
 
 function renderEmails(){
     cnt.textContent = "Đã dùng: " + used.filter(x=>x).length + "/10";
     emails.innerHTML = "";
     mails.forEach((m, i) => {
-        let r = document.createElement("div");
-        r.className = "row";
+        let r = document.createElement("div"); r.className = "row";
         r.innerHTML = `<div class='grow'><b>Mail ${i+1}</b><br>${m||"(trống)"}${used[i]?" <span class='used'>✅</span>":""}</div>`;
-        let b = document.createElement("button");
-        b.textContent = "Copy";
+        let b = document.createElement("button"); b.textContent = "Copy";
         b.onclick = () => { if(m) navigator.clipboard.writeText(m); used[i] = !used[i]; saveData({used}); };
-        r.appendChild(b);
-        emails.appendChild(r);
+        r.appendChild(b); emails.appendChild(r);
     });
 }
 
 function renderLinks(){
     const c = document.getElementById("linksContainer");
-    c.innerHTML = "";
+    if(c.innerHTML !== "") return;
     links.forEach((item, i) => {
-        const box = document.createElement("div");
-        box.className = "linkbox";
-        const name = document.createElement("input"); name.value = item.name;
-        name.oninput = (e) => { links[i].name = e.target.value; saveData({links}); };
-        const url = document.createElement("input"); url.style.marginTop="8px"; url.value = item.url;
-        url.oninput = (e) => { links[i].url = e.target.value; saveData({links}); };
-        box.append(name, url);
-        c.appendChild(box);
+        const box = document.createElement("div"); box.className = "linkbox";
+        const n = document.createElement("input"); n.value = item.name; n.oninput = (e) => { links[i].name = e.target.value; saveData({links}); };
+        const u = document.createElement("input"); u.style.marginTop="8px"; u.value = item.url; u.oninput = (e) => { links[i].url = e.target.value; saveData({links}); };
+        box.append(n, u); c.appendChild(box);
     });
 }
 
@@ -134,30 +137,23 @@ function renderAccounts(){
     const container = document.getElementById("accContainer");
     container.innerHTML = "";
     for(let i=0; i<150; i++){
-        let div = document.createElement("div");
-        div.className = "row";
-        
+        let div = document.createElement("div"); div.className = "row";
         let num = document.createElement("span"); num.className = "num-label"; num.textContent = (i+1);
-        let nameInp = document.createElement("input"); nameInp.placeholder = "Tên"; nameInp.className = "grow"; nameInp.value = accounts[i].name;
-        nameInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
-        let btn1 = document.createElement("button"); btn1.textContent = "📋"; btn1.onclick = () => navigator.clipboard.writeText(accounts[i].name);
-        
-        let passInp = document.createElement("input"); passInp.placeholder = "Pass"; passInp.className = "acc-input-pass"; passInp.value = accounts[i].pass;
-        passInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
-        let btn2 = document.createElement("button"); btn2.textContent = "📋"; btn2.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
-
-        div.append(num, nameInp, btn1, passInp, btn2);
-        container.appendChild(div);
+        let nInp = document.createElement("input"); nInp.id = `name-${i}`; nInp.placeholder = "Tên"; nInp.className = "grow"; nInp.value = accounts[i].name;
+        nInp.oninput = (e) => { accounts[i].name = e.target.value; saveData({accounts}); };
+        let b1 = document.createElement("button"); b1.textContent = "📋"; b1.onclick = () => navigator.clipboard.writeText(accounts[i].name);
+        let pInp = document.createElement("input"); pInp.id = `pass-${i}`; pInp.placeholder = "Pass"; pInp.className = "acc-input-pass"; pInp.value = accounts[i].pass;
+        pInp.oninput = (e) => { accounts[i].pass = e.target.value; saveData({accounts}); };
+        let b2 = document.createElement("button"); b2.textContent = "📋"; b2.onclick = () => navigator.clipboard.writeText(accounts[i].pass);
+        div.append(num, nInp, b1, pInp, b2); container.appendChild(div);
     }
 }
 
-// Event Listeners
 document.getElementById("btn-update").onclick = () => {
     let arr = bulk.value.trim().split(/\n+/).map(v => v.split("|")[0].trim());
     mails = [...arr, ...Array(10).fill("")].slice(0, 10);
     used = Array(10).fill(false);
-    saveData({mails, used});
-    bulk.value = "";
+    saveData({mails, used}); bulk.value = "";
 };
 document.getElementById("btn-reset").onclick = () => saveData({used: Array(10).fill(false)});
 document.getElementById("btn-copy-pwd").onclick = () => navigator.clipboard.writeText(pwd.value);
