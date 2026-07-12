@@ -106,7 +106,8 @@ function render() {
         let box = document.createElement("div"); box.className = "linkbox";
         let n = document.createElement("input"); n.value = l.name; n.id = "ln"+i; n.oninput = (e)=>{state.links[i].name=e.target.value; update(hubRef, {links:state.links});};
         let u = document.createElement("input"); u.value = l.url; u.id = "lu"+i; u.style.marginTop="5px"; u.oninput = (e)=>{state.links[i].url=e.target.value; update(hubRef, {links:state.links});};
-        box.append(n, u); linksContainer.appendChild(box);
+        let b = document.createElement("button"); b.textContent="Mở"; b.style.marginTop="8px"; b.onclick=()=>{if(l.url) window.open(l.url,"_blank")};
+        box.append(n, u, b); linksContainer.appendChild(box);
     });
 
     // 3. Render 150 Accounts
