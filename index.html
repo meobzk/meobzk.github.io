@@ -90,13 +90,17 @@ onValue(hubRef, (snap) => {
 function render() {
     const activeId = document.activeElement ? document.activeElement.id : null;
     
-    // 1. Render Mail
+    // 1. Render Mail (Với logic Toggle)
     emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
     state.mails.forEach((m,i) => {
         let r = document.createElement("div"); r.className = "row";
         r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m||"(trống)"}</div>`;
         let b = document.createElement("button"); b.textContent = "Copy";
-        b.onclick = () => { if(m) navigator.clipboard.writeText(m); state.used[i] = true; update(hubRef, {used: state.used}); };
+        b.onclick = () => { 
+            if(m) navigator.clipboard.writeText(m); 
+            state.used[i] = !state.used[i]; // Logic Toggle: Ấn lần 1 là true, lần 2 là false
+            update(hubRef, {used: state.used}); 
+        };
         r.appendChild(b); emails.appendChild(r);
     });
 
