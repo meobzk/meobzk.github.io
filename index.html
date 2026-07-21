@@ -15,7 +15,7 @@
     .checked{background:#d4edda;border-color:#28a745}
     .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
     summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
-    .num-label{width:30px;font-size:12px;color:#666;flex-shrink:0}
+    .num-label{width:35px;font-size:12px;color:#666;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -50,8 +50,11 @@
 
 <div class="card">
     <details>
-        <summary>👤 150 Account</summary>
-        <button id="btn-reset-acc" style="background:#ff4d4f;width:100%;margin:10px 0;">Reset tất cả dấu tích ✅</button>
+        <summary>👤 200 Account</summary>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+            <button id="btn-copy-all-names" style="background:#28a745; flex:1;">📋 Copy tất cả Tên</button>
+            <button id="btn-reset-acc" style="background:#ff4d4f; flex:1;">Reset tất cả dấu tích ✅</button>
+        </div>
         <div id="accContainer"></div>
     </details>
 </div>
@@ -80,7 +83,8 @@ onValue(hubRef, (snap) => {
     state.mails = data.mails || Array(10).fill("");
     state.used = data.used || Array(10).fill(false);
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
-    state.accounts = data.accounts || Array.from({length: 150}, () => ({name: "", pass: "", checked: false}));
+    // Mở rộng lên đúng 200 account
+    state.accounts = data.accounts || Array.from({length: 200}, () => ({name: "", pass: "", checked: false}));
     
     if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
     if(document.activeElement.id !== "note") note.value = data.note || "";
@@ -90,7 +94,7 @@ onValue(hubRef, (snap) => {
 function render() {
     const activeId = document.activeElement ? document.activeElement.id : null;
     
-    // 1. Render Mail (Với logic Toggle)
+    // 1. Render Mail (Toggle)
     emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
     state.mails.forEach((m,i) => {
         let r = document.createElement("div"); r.className = "row";
@@ -98,7 +102,7 @@ function render() {
         let b = document.createElement("button"); b.textContent = "Copy";
         b.onclick = () => { 
             if(m) navigator.clipboard.writeText(m); 
-            state.used[i] = !state.used[i]; // Logic Toggle: Ấn lần 1 là true, lần 2 là false
+            state.used[i] = !state.used[i]; 
             update(hubRef, {used: state.used}); 
         };
         r.appendChild(b); emails.appendChild(r);
@@ -114,7 +118,7 @@ function render() {
         box.append(n, u, b); linksContainer.appendChild(box);
     });
 
-    // 3. Render 150 Accounts
+    // 3. Render 200 Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -136,6 +140,15 @@ function render() {
 
 document.getElementById("btn-update").onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
 document.getElementById("btn-reset-mail").onclick = () => update(hubRef, {used: Array(10).fill(false)});
+
+// Tính năng Copy tất cả Tên của 200 account (mỗi tên một dòng)
+document.getElementById("btn-copy-all-names").onclick = () => {
+    let allNames = state.accounts.map(acc => acc.name || "").join("\n");
+    navigator.clipboard.writeText(allNames).then(() => {
+        alert("Đã copy toàn bộ tên của 200 account vào bộ nhớ tạm!");
+    });
+};
+
 document.getElementById("btn-reset-acc").onclick = () => {
     let newAccs = state.accounts.map(a => ({...a, checked: false}));
     update(hubRef, {accounts: newAccs});
