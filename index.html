@@ -83,8 +83,12 @@ onValue(hubRef, (snap) => {
     state.mails = data.mails || Array(10).fill("");
     state.used = data.used || Array(10).fill(false);
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
-    // Mở rộng lên đúng 200 account
-    state.accounts = data.accounts || Array.from({length: 200}, () => ({name: "", pass: "", checked: false}));
+    
+    // Lấy dữ liệu cũ, nếu ít hơn 200 thì tự động lấp đầy thêm các ô trống đến đủ 200 account mà không làm mất dữ liệu cũ
+    let loadedAccs = data.accounts || [];
+    state.accounts = Array.from({length: 200}, (_, i) => {
+        return loadedAccs[i] || { name: "", pass: "", checked: false };
+    });
     
     if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
     if(document.activeElement.id !== "note") note.value = data.note || "";
@@ -141,7 +145,6 @@ function render() {
 document.getElementById("btn-update").onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
 document.getElementById("btn-reset-mail").onclick = () => update(hubRef, {used: Array(10).fill(false)});
 
-// Tính năng Copy tất cả Tên của 200 account (mỗi tên một dòng)
 document.getElementById("btn-copy-all-names").onclick = () => {
     let allNames = state.accounts.map(acc => acc.name || "").join("\n");
     navigator.clipboard.writeText(allNames).then(() => {
