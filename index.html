@@ -84,7 +84,7 @@ onValue(hubRef, (snap) => {
     state.used = data.used || Array(10).fill(false);
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     
-    // Lấy dữ liệu cũ, nếu ít hơn 200 thì tự động lấp đầy thêm các ô trống đến đủ 200 account mà không làm mất dữ liệu cũ
+    // Ép buộc khởi tạo đúng đủ 200 phần tử (giữ lại dữ liệu cũ, phần thiếu tự động điền rỗng)
     let loadedAccs = data.accounts || [];
     state.accounts = Array.from({length: 200}, (_, i) => {
         return loadedAccs[i] || { name: "", pass: "", checked: false };
