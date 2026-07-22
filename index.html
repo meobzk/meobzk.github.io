@@ -15,7 +15,7 @@
     .checked{background:#d4edda;border-color:#28a745}
     .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
     summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
-    .num-label{width:35px;font-size:12px;color:#666;flex-shrink:0}
+    .num-label{width:25px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
 </style>
 </head>
 <body>
@@ -48,6 +48,14 @@
     </details>
 </div>
 
+<!-- MỤC WIFI 31 DÒNG - 62 TÊN KHÁC BIỆT HOÀN TOÀN -->
+<div class="card">
+    <details>
+        <summary>📶 31 WiFi (2.4G & 5G độc lập)</summary>
+        <div id="wifiContainer" style="margin-top:10px"></div>
+    </details>
+</div>
+
 <div class="card">
     <details>
         <summary>👤 200 Account</summary>
@@ -76,7 +84,27 @@ const firebaseConfig = {
 const db = getDatabase(initializeApp(firebaseConfig));
 const hubRef = ref(db, 'hub');
 
-let state = { mails:[], used:[], links:[], accounts:[], pwd:"", note:"" };
+// 31 tên riêng biệt cho cột 2.4G
+const wifi24List = [
+    "Càfe Mai", "Cafe Daily", "Quán Càfe Gió", "Cafe Mộc", "Càfe Phố",
+    "Cafe Sưa", "Càfe Xưa", "Cafe Góc", "Càfe Trúc", "Cafe Xanh",
+    "Càfe Đen", "Cafe Nâu", "Quán Càfe Đất", "Cafe Mây", "Càfe Nắng",
+    "Cafe Mưa", "Càfe Sáng", "Cafe Đêm", "Càfe Phố Núi", "Cafe Biển",
+    "Càfe Sài Gòn", "Cafe Hà Nội", "Càfe Huế", "Cafe Đà Nẵng", "Càfe Vườn",
+    "Cafe Sách", "Càfe Acoustic", "Cafe Hơi Nước", "Càfe Cóc", "Cafe Bệt", "Càfe Chill"
+];
+
+// 31 tên riêng biệt hoàn toàn cho cột 5G
+const wifi5List = [
+    "Càfe Moonlight", "Cafe Horizon", "Quán Càfe Lặng", "Cafe Mây Trắng", "Càfe Góc Phố",
+    "Cafe Hoàng Hôn", "Càfe Bình Minh", "Cafe Thềm Xưa", "Càfe Gỗ", "Cafe Bản Làng",
+    "Càfe Giọt Đắng", "Cafe Sữa Đá", "Quán Càfe Thơ", "Cafe Không Gian", "Càfe Gió Lộng",
+    "Cafe Bọt Biển", "Càfe Tinh Khôi", "Cafe Đom Đóm", "Càfe Thượng Uyển", "Cafe Hoàng Gia",
+    "Càfe Sương Mờ", "Cafe Hồ Tây", "Càfe Hương Giang", "Cafe Mỹ Khê", "Càfe Ngoại Ô",
+    "Cafe Tri Thức", "Càfe Lãng Mạn", "Cafe Khói Chiều", "Càfe Hẻm Nhỏ", "Cafe Vỉa Hè", "Càfe Hạnh Phúc"
+];
+
+let state = { mails:[], used:[], links:[], wifis:[], accounts:[], pwd:"", note:"" };
 
 onValue(hubRef, (snap) => {
     const data = snap.val() || {};
@@ -84,7 +112,15 @@ onValue(hubRef, (snap) => {
     state.used = data.used || Array(10).fill(false);
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     
-    // Ép buộc khởi tạo đúng đủ 200 phần tử (giữ lại dữ liệu cũ, phần thiếu tự động điền rỗng)
+    // Khởi tạo 31 WiFi với tên 2 cột hoàn toàn khác nhau
+    let loadedWifis = data.wifis || [];
+    state.wifis = Array.from({length: 31}, (_, i) => {
+        let def24 = wifi24List[i] || ("Cafe " + (i+1));
+        let def5 = wifi5List[i] || ("Cafe Pro " + (i+1));
+        return loadedWifis[i] || { w24: def24, w5: def5 };
+    });
+
+    // Khởi tạo 200 Account
     let loadedAccs = data.accounts || [];
     state.accounts = Array.from({length: 200}, (_, i) => {
         return loadedAccs[i] || { name: "", pass: "", checked: false };
@@ -122,7 +158,30 @@ function render() {
         box.append(n, u, b); linksContainer.appendChild(box);
     });
 
-    // 3. Render 200 Accounts
+    // 3. Render 31 WiFi (2 cột khác hẳn nhau)
+    wifiContainer.innerHTML = "";
+    state.wifis.forEach((wf, i) => {
+        let div = document.createElement("div"); div.className = "row";
+        
+        let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
+        
+        // Cột 2.4G
+        let w24Input = document.createElement("input"); w24Input.value = wf.w24; w24Input.className = "grow"; w24Input.placeholder = "2.4G"; w24Input.id = "w24_"+i;
+        w24Input.oninput = (e) => { state.wifis[i].w24 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b24 = document.createElement("button"); b24.textContent = "📋 2.4G"; b24.style.background = "#52c41a";
+        b24.onclick = () => navigator.clipboard.writeText(wf.w24);
+
+        // Cột 5G
+        let w5Input = document.createElement("input"); w5Input.value = wf.w5; w5Input.className = "grow"; w5Input.placeholder = "5G"; w5Input.id = "w5_"+i;
+        w5Input.oninput = (e) => { state.wifis[i].w5 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b5 = document.createElement("button"); b5.textContent = "📋 5G"; b5.style.background = "#722ed1";
+        b5.onclick = () => navigator.clipboard.writeText(wf.w5);
+
+        div.append(lbl, w24Input, b24, w5Input, b5);
+        wifiContainer.appendChild(div);
+    });
+
+    // 4. Render 200 Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -139,6 +198,7 @@ function render() {
         div.append(n, c1, p, c2, c);
         accContainer.appendChild(div);
     });
+
     if(activeId && document.getElementById(activeId)) document.getElementById(activeId).focus();
 }
 
