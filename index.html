@@ -48,10 +48,10 @@
     </details>
 </div>
 
-<!-- MỤC WIFI 31 DÒNG - 62 TÊN KHÁC BIỆT HOÀN TOÀN -->
+<!-- MỤC WIFI 31 DÒNG - 62 TÊN TIẾNG ANH / NHẬT KHÁC BIỆT HOÀN TOÀN -->
 <div class="card">
     <details>
-        <summary>📶 31 WiFi (2.4G & 5G độc lập)</summary>
+        <summary>📶 31 WiFi (Japan & English Styles)</summary>
         <div id="wifiContainer" style="margin-top:10px"></div>
     </details>
 </div>
@@ -84,24 +84,24 @@ const firebaseConfig = {
 const db = getDatabase(initializeApp(firebaseConfig));
 const hubRef = ref(db, 'hub');
 
-// 31 tên riêng biệt cho cột 2.4G
+// 31 tên phong cách Nhật/Anh cho cột 2.4G
 const wifi24List = [
-    "Càfe Mai", "Cafe Daily", "Quán Càfe Gió", "Cafe Mộc", "Càfe Phố",
-    "Cafe Sưa", "Càfe Xưa", "Cafe Góc", "Càfe Trúc", "Cafe Xanh",
-    "Càfe Đen", "Cafe Nâu", "Quán Càfe Đất", "Cafe Mây", "Càfe Nắng",
-    "Cafe Mưa", "Càfe Sáng", "Cafe Đêm", "Càfe Phố Núi", "Cafe Biển",
-    "Càfe Sài Gòn", "Cafe Hà Nội", "Càfe Huế", "Cafe Đà Nẵng", "Càfe Vườn",
-    "Cafe Sách", "Càfe Acoustic", "Cafe Hơi Nước", "Càfe Cóc", "Cafe Bệt", "Càfe Chill"
+    "Cafe Hana", "Kissa Sakura", "Tokyo Coffee", "Matcha Hub", "Nihon Cafe",
+    "Osaka Roastery", "Kyoto Brew", "Yuki Cafe", "Sora Coffee", "Mori Cafe",
+    "Haru Stand", "Natsu Brew", "Aki Coffee", "Fuyu Lounge", "Zen Cafe",
+    "Neon Tokyo", "Shibuya Beans", "Shinjuku Cup", "Akiba Cafe", "Ginza Roast",
+    "Roppongi Brew", "Asakusa Coffee", "Fuji View", "Matcha House", "Ueno Beans",
+    "Hokkaido Cup", "Okinawa Chill", "Nagoya Roast", "Sendai Coffee", "Kobe Lounge", "Nippon Cafe"
 ];
 
-// 31 tên riêng biệt hoàn toàn cho cột 5G
+// 31 tên phong cách Nhật/Anh khác hoàn toàn cho cột 5G
 const wifi5List = [
-    "Càfe Moonlight", "Cafe Horizon", "Quán Càfe Lặng", "Cafe Mây Trắng", "Càfe Góc Phố",
-    "Cafe Hoàng Hôn", "Càfe Bình Minh", "Cafe Thềm Xưa", "Càfe Gỗ", "Cafe Bản Làng",
-    "Càfe Giọt Đắng", "Cafe Sữa Đá", "Quán Càfe Thơ", "Cafe Không Gian", "Càfe Gió Lộng",
-    "Cafe Bọt Biển", "Càfe Tinh Khôi", "Cafe Đom Đóm", "Càfe Thượng Uyển", "Cafe Hoàng Gia",
-    "Càfe Sương Mờ", "Cafe Hồ Tây", "Càfe Hương Giang", "Cafe Mỹ Khê", "Càfe Ngoại Ô",
-    "Cafe Tri Thức", "Càfe Lãng Mạn", "Cafe Khói Chiều", "Càfe Hẻm Nhỏ", "Cafe Vỉa Hè", "Càfe Hạnh Phúc"
+    "Cafe Mugi", "Kissa Machi", "Edo Coffee", "Sencha Hub", "Honshu Cafe",
+    "Hakata Roastery", "Nara Brew", "Hoshi Cafe", "Kaze Coffee", "Tori Cafe",
+    "Kura Stand", "Yama Brew", "Tsuki Coffee", "Umi Lounge", "Miso Cafe",
+    "Cyber Tokyo", "Kanagawa Beans", "Chiba Cup", "Saitama Cafe", "Fukuoka Roast",
+    "Yokohama Brew", "Hiroshima Coffee", "Sapporo View", "Oita House", "Kumamoto Beans",
+    "Nagano Cup", "Shizuoka Chill", "Gunma Roast", "Tochigi Coffee", "Ibaraki Lounge", "Akita Cafe"
 ];
 
 let state = { mails:[], used:[], links:[], wifis:[], accounts:[], pwd:"", note:"" };
@@ -112,7 +112,7 @@ onValue(hubRef, (snap) => {
     state.used = data.used || Array(10).fill(false);
     state.links = data.links || Array.from({length: 8}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     
-    // Khởi tạo 31 WiFi với tên 2 cột hoàn toàn khác nhau
+    // Khởi tạo 31 WiFi với tên Nhật/Anh độc lập 2 cột
     let loadedWifis = data.wifis || [];
     state.wifis = Array.from({length: 31}, (_, i) => {
         let def24 = wifi24List[i] || ("Cafe " + (i+1));
@@ -158,7 +158,7 @@ function render() {
         box.append(n, u, b); linksContainer.appendChild(box);
     });
 
-    // 3. Render 31 WiFi (2 cột khác hẳn nhau)
+    // 3. Render 31 WiFi (Tiếng Nhật / Anh độc lập 2 cột)
     wifiContainer.innerHTML = "";
     state.wifis.forEach((wf, i) => {
         let div = document.createElement("div"); div.className = "row";
