@@ -57,7 +57,7 @@
     </details>
 </div>
 
-<!-- MỤC WIFI 4 CỘT -->
+<!-- MỤC WIFI 4 CỘT (124 TÊN ĐỘC LẬP) -->
 <div class="card">
     <details>
         <summary>📶 31 WiFi (4 Cột: 2x 2.4G & 2x 5G)</summary>
@@ -154,10 +154,10 @@ onValue(hubRef, (snap) => {
     
     let loadedWifis = data.wifis || [];
     state.wifis = Array.from({length: 31}, (_, i) => {
-        let def24_1 = wifi24List1[i] || ("Cafe " + (i+1));
-        let def24_2 = wifi24List2[i] || ("Cafe B " + (i+1));
-        let def5_1 = wifi5List1[i] || ("Cafe Pro " + (i+1));
-        let def5_2 = wifi5List2[i] || ("Cafe ProB " + (i+1));
+        let def24_1 = wifi24List1[i];
+        let def24_2 = wifi24List2[i];
+        let def5_1 = wifi5List1[i];
+        let def5_2 = wifi5List2[i];
         return loadedWifis[i] || { w24_1: def24_1, w24_2: def24_2, w5_1: def5_1, w5_2: def5_2 };
     });
 
@@ -221,7 +221,7 @@ function render() {
         box.append(n, u, b); linksContainer.appendChild(box);
     });
 
-    // 4. Render 31 WiFi
+    // 4. Render 31 WiFi (4 Cột)
     wifiContainer.innerHTML = "";
     state.wifis.forEach((wf, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -251,7 +251,7 @@ function render() {
         wifiContainer.appendChild(div);
     });
 
-    // 5. Render 200 Accounts (Có 2 ô tích)
+    // 5. Render 200 Accounts
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -264,12 +264,10 @@ function render() {
         p.oninput = (e)=>{ state.accounts[i].pass = e.target.value; update(hubRef, {accounts:state.accounts}); };
         let c2 = document.createElement("button"); c2.textContent="📋"; c2.onclick=()=>navigator.clipboard.writeText(acc.pass);
 
-        // Ô tích thứ 1
         let chk1 = document.createElement("button"); chk1.className = "check-btn " + (acc.checked1 ? "checked" : "");
         chk1.innerHTML = acc.checked1 ? "✅" : "";
         chk1.onclick = () => { state.accounts[i].checked1 = !state.accounts[i].checked1; update(hubRef, {accounts: state.accounts}); };
 
-        // Ô tích thứ 2
         let chk2 = document.createElement("button"); chk2.className = "check-btn " + (acc.checked2 ? "checked" : "");
         chk2.innerHTML = acc.checked2 ? "✅" : "";
         chk2.onclick = () => { state.accounts[i].checked2 = !state.accounts[i].checked2; update(hubRef, {accounts: state.accounts}); };
@@ -308,13 +306,11 @@ document.getElementById("btn-copy-all-names").onclick = () => {
     navigator.clipboard.writeText(allNames).then(() => alert("Đã copy toàn bộ tên của 200 account!"));
 };
 
-// Reset riêng cột tích 1 của 200 acc
 document.getElementById("btn-reset-acc1").onclick = () => {
     let newAccs = state.accounts.map(a => ({...a, checked1: false}));
     update(hubRef, {accounts: newAccs});
 };
 
-// Reset riêng cột tích 2 của 200 acc
 document.getElementById("btn-reset-acc2").onclick = () => {
     let newAccs = state.accounts.map(a => ({...a, checked2: false}));
     update(hubRef, {accounts: newAccs});
