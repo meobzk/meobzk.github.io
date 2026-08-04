@@ -57,7 +57,7 @@
     </details>
 </div>
 
-<!-- MỤC WIFI 4 CỘT (124 TÊN ĐỘC LẬP) -->
+<!-- MỤC WIFI 4 CỘT -->
 <div class="card">
     <details>
         <summary>📶 31 WiFi (4 Cột: 2x 2.4G & 2x 5G)</summary>
@@ -65,7 +65,7 @@
     </details>
 </div>
 
-<!-- MỤC 200 ACCOUNT (2 Ô TÍCH RIÊNG BIỆT) -->
+<!-- MỤC 200 ACCOUNT -->
 <div class="card">
     <details>
         <summary>👤 200 Account (2 Cột Tích ✅)</summary>
@@ -154,11 +154,13 @@ onValue(hubRef, (snap) => {
     
     let loadedWifis = data.wifis || [];
     state.wifis = Array.from({length: 31}, (_, i) => {
-        let def24_1 = wifi24List1[i];
-        let def24_2 = wifi24List2[i];
-        let def5_1 = wifi5List1[i];
-        let def5_2 = wifi5List2[i];
-        return loadedWifis[i] || { w24_1: def24_1, w24_2: def24_2, w5_1: def5_1, w5_2: def5_2 };
+        let item = loadedWifis[i] || {};
+        return { 
+            w24_1: item.w24_1 && item.w24_1 !== "undefined" ? item.w24_1 : wifi24List1[i], 
+            w24_2: item.w24_2 && item.w24_2 !== "undefined" ? item.w24_2 : wifi24List2[i], 
+            w5_1: item.w5_1 && item.w5_1 !== "undefined" ? item.w5_1 : wifi5List1[i], 
+            w5_2: item.w5_2 && item.w5_2 !== "undefined" ? item.w5_2 : wifi5List2[i] 
+        };
     });
 
     let loadedAccs = data.accounts || [];
