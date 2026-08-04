@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Android Setup Hub</title>
 <style>
-    body{font-family:Arial;background:#eef2f5;max-width:760px;margin:auto;padding:16px}
+    body{font-family:Arial;background:#eef2f5;max-width:900px;margin:auto;padding:16px}
     .card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
-    .row{display:flex;gap:6px;align-items:center;margin:6px 0}
+    .row{display:flex;gap:4px;align-items:center;margin:6px 0}
     .grow{flex:1}
     input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
-    button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer;white-space:nowrap}
-    .check-btn{background:#fff;border:1px solid #ccc;width:40px;height:35px;font-size:18px;border-radius:6px}
+    button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 8px;cursor:pointer;white-space:nowrap;font-size:12px}
+    .check-btn{background:#fff;border:1px solid #ccc;width:38px;height:35px;font-size:18px;border-radius:6px;cursor:pointer}
     .checked{background:#d4edda;border-color:#28a745}
     .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
     summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
-    .num-label{width:35px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
+    .num-label{width:30px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
 </style>
 </head>
 <body>
@@ -41,7 +41,7 @@
     <button style="margin-top:10px" id="btn-copy-pwd">📋 Copy Password</button>
 </div>
 
-<!-- MỤC GIFTUTO 10 DÒNG (NÚT MỞ & XÓA) -->
+<!-- 10 LINK GIFTUTO -->
 <div class="card">
     <details>
         <summary>🎁 10 Link Giftuto</summary>
@@ -57,20 +57,22 @@
     </details>
 </div>
 
-<!-- MỤC WIFI 31 DÒNG -->
+<!-- MỤC WIFI 4 CỘT -->
 <div class="card">
     <details>
-        <summary>📶 31 WiFi (Japan & English Styles)</summary>
+        <summary>📶 31 WiFi (4 Cột: 2x 2.4G & 2x 5G)</summary>
         <div id="wifiContainer" style="margin-top:10px"></div>
     </details>
 </div>
 
+<!-- MỤC 200 ACCOUNT (2 Ô TÍCH RIÊNG BIỆT) -->
 <div class="card">
     <details>
-        <summary>👤 200 Account</summary>
-        <div style="display:flex; gap:8px; margin:10px 0;">
-            <button id="btn-copy-all-names" style="background:#28a745; flex:1;">📋 Copy tất cả Tên</button>
-            <button id="btn-reset-acc" style="background:#ff4d4f; flex:1;">Reset tất cả dấu tích ✅</button>
+        <summary>👤 200 Account (2 Cột Tích ✅)</summary>
+        <div style="display:flex; gap:6px; margin:10px 0; flex-wrap:wrap;">
+            <button id="btn-copy-all-names" style="background:#28a745; flex:1; min-width:140px;">📋 Copy tất cả Tên</button>
+            <button id="btn-reset-acc1" style="background:#faad14; flex:1; min-width:140px;">Reset Tích Cột 1 🔄</button>
+            <button id="btn-reset-acc2" style="background:#ff4d4f; flex:1; min-width:140px;">Reset Tích Cột 2 🔄</button>
         </div>
         <div id="accContainer"></div>
     </details>
@@ -105,7 +107,7 @@ const firebaseConfig = {
 const db = getDatabase(initializeApp(firebaseConfig));
 const hubRef = ref(db, 'hub');
 
-const wifi24List = [
+const wifi24List1 = [
     "Cafe Hana", "Kissa Sakura", "Tokyo Coffee", "Matcha Hub", "Nihon Cafe",
     "Osaka Roastery", "Kyoto Brew", "Yuki Cafe", "Sora Coffee", "Mori Cafe",
     "Haru Stand", "Natsu Brew", "Aki Coffee", "Fuyu Lounge", "Zen Cafe",
@@ -114,13 +116,31 @@ const wifi24List = [
     "Hokkaido Cup", "Okinawa Chill", "Nagoya Roast", "Sendai Coffee", "Kobe Lounge", "Nippon Cafe"
 ];
 
-const wifi5List = [
+const wifi24List2 = [
+    "Cafe Lumiere", "Kissa Retro", "Chiyoda Brew", "Sencha Bar", "Honshu Bean",
+    "Matsue Roast", "Takamatsu Cup", "Aomori Cafe", "Niigata Chill", "Sakai Lounge",
+    "Kawasaki Roast", "Sagamihara Cup", "Hamamatsu Brew", "Okayama Cafe", "Kumamoto Chill",
+    "Kagoshima Bean", "Funabashi Stand", "Hachioji Roast", "Himeji Lounge", "Matsuyama Cup",
+    "Utsunomiya Cafe", "Kanazawa Brew", "Oita Chill", "Nagasaki Roast", "Yokosuka Bean",
+    "Toyama Cup", "Naha Lounge", "Miyazaki Cafe", "Iwate Roast", "Shiga Brew", "Nihonbashi Hub"
+];
+
+const wifi5List1 = [
     "Cafe Mugi", "Kissa Machi", "Edo Coffee", "Sencha Hub", "Honshu Cafe",
     "Hakata Roastery", "Nara Brew", "Hoshi Cafe", "Kaze Coffee", "Tori Cafe",
     "Kura Stand", "Yama Brew", "Tsuki Coffee", "Umi Lounge", "Miso Cafe",
     "Cyber Tokyo", "Kanagawa Beans", "Chiba Cup", "Saitama Cafe", "Fukuoka Roast",
     "Yokohama Brew", "Hiroshima Coffee", "Sapporo View", "Oita House", "Kumamoto Beans",
     "Nagano Cup", "Shizuoka Chill", "Gunma Roast", "Tochigi Coffee", "Ibaraki Lounge", "Akita Cafe"
+];
+
+const wifi5List2 = [
+    "Cafe Nova", "Kissa Sol", "Minato Brew", "Matcha Lab", "Kansai Roast",
+    "Chiba Hub", "Saitama Lounge", "Ibaraki Cup", "Gifu Cafe", "Yamaguchi Chill",
+    "Nagano Bean", "Gunma Stand", "Tochigi Roast", "Fukushima Lounge", "Miyagi Cup",
+    "Shiga Cafe", "Ehime Brew", "Kochi Chill", "Saga Roast", "Yamagata Bean",
+    "Tokushima Cup", "Kagawa Lounge", "Fukui Cafe", "Wakayama Brew", "Yamanashi Chill",
+    "Hyogo Roast", "Aichi Bean", "Shizuoka Cup", "Hokkaido Lounge", "Kyushu Cafe", "Tokyo Station"
 ];
 
 let state = { mails:[], used:[], giftutos:[], links:[], wifis:[], accounts:[], accounts1000:[], pwd:"", note:"" };
@@ -134,14 +154,16 @@ onValue(hubRef, (snap) => {
     
     let loadedWifis = data.wifis || [];
     state.wifis = Array.from({length: 31}, (_, i) => {
-        let def24 = wifi24List[i] || ("Cafe " + (i+1));
-        let def5 = wifi5List[i] || ("Cafe Pro " + (i+1));
-        return loadedWifis[i] || { w24: def24, w5: def5 };
+        let def24_1 = wifi24List1[i] || ("Cafe " + (i+1));
+        let def24_2 = wifi24List2[i] || ("Cafe B " + (i+1));
+        let def5_1 = wifi5List1[i] || ("Cafe Pro " + (i+1));
+        let def5_2 = wifi5List2[i] || ("Cafe ProB " + (i+1));
+        return loadedWifis[i] || { w24_1: def24_1, w24_2: def24_2, w5_1: def5_1, w5_2: def5_2 };
     });
 
     let loadedAccs = data.accounts || [];
     state.accounts = Array.from({length: 200}, (_, i) => {
-        return loadedAccs[i] || { name: "", pass: "", checked: false };
+        return loadedAccs[i] || { name: "", pass: "", checked1: false, checked2: false };
     });
 
     let loadedAccs1000 = data.accounts1000 || [];
@@ -171,7 +193,7 @@ function render() {
         r.appendChild(b); emails.appendChild(r);
     });
 
-    // 2. Render Giftuto (Nút Mở & Xóa)
+    // 2. Render Giftuto
     giftutoContainer.innerHTML = "";
     state.giftutos.forEach((gUrl, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -205,35 +227,55 @@ function render() {
         let div = document.createElement("div"); div.className = "row";
         let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
         
-        let w24Input = document.createElement("input"); w24Input.value = wf.w24; w24Input.className = "grow"; w24Input.placeholder = "2.4G"; w24Input.id = "w24_"+i;
-        w24Input.oninput = (e) => { state.wifis[i].w24 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b24 = document.createElement("button"); b24.textContent = "📋 2.4G"; b24.style.background = "#52c41a";
-        b24.onclick = () => navigator.clipboard.writeText(wf.w24);
+        let i1 = document.createElement("input"); i1.value = wf.w24_1; i1.className = "grow"; i1.placeholder = "2.4G-1"; i1.id = "w24_1_"+i;
+        i1.oninput = (e) => { state.wifis[i].w24_1 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b1 = document.createElement("button"); b1.textContent = "📋"; b1.style.background = "#52c41a";
+        b1.onclick = () => navigator.clipboard.writeText(wf.w24_1);
 
-        let w5Input = document.createElement("input"); w5Input.value = wf.w5; w5Input.className = "grow"; w5Input.placeholder = "5G"; w5Input.id = "w5_"+i;
-        w5Input.oninput = (e) => { state.wifis[i].w5 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b5 = document.createElement("button"); b5.textContent = "📋 5G"; b5.style.background = "#722ed1";
-        b5.onclick = () => navigator.clipboard.writeText(wf.w5);
+        let i2 = document.createElement("input"); i2.value = wf.w24_2; i2.className = "grow"; i2.placeholder = "2.4G-2"; i2.id = "w24_2_"+i;
+        i2.oninput = (e) => { state.wifis[i].w24_2 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b2 = document.createElement("button"); b2.textContent = "📋"; b2.style.background = "#13c2c2";
+        b2.onclick = () => navigator.clipboard.writeText(wf.w24_2);
 
-        div.append(lbl, w24Input, b24, w5Input, b5);
+        let i3 = document.createElement("input"); i3.value = wf.w5_1; i3.className = "grow"; i3.placeholder = "5G-1"; i3.id = "w5_1_"+i;
+        i3.oninput = (e) => { state.wifis[i].w5_1 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b3 = document.createElement("button"); b3.textContent = "📋"; b3.style.background = "#722ed1";
+        b3.onclick = () => navigator.clipboard.writeText(wf.w5_1);
+
+        let i4 = document.createElement("input"); i4.value = wf.w5_2; i4.className = "grow"; i4.placeholder = "5G-2"; i4.id = "w5_2_"+i;
+        i4.oninput = (e) => { state.wifis[i].w5_2 = e.target.value; update(hubRef, {wifis: state.wifis}); };
+        let b4 = document.createElement("button"); b4.textContent = "📋"; b4.style.background = "#eb2f96";
+        b4.onclick = () => navigator.clipboard.writeText(wf.w5_2);
+
+        div.append(lbl, i1, b1, i2, b2, i3, b3, i4, b4);
         wifiContainer.appendChild(div);
     });
 
-    // 5. Render 200 Accounts
+    // 5. Render 200 Accounts (Có 2 ô tích)
     accContainer.innerHTML = "";
     state.accounts.forEach((acc, i) => {
         let div = document.createElement("div"); div.className = "row";
+        
         let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; 
         n.oninput = (e)=>{ state.accounts[i].name = e.target.value; update(hubRef, {accounts:state.accounts}); };
         let c1 = document.createElement("button"); c1.textContent="📋"; c1.onclick=()=>navigator.clipboard.writeText(acc.name);
+        
         let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i;
         p.oninput = (e)=>{ state.accounts[i].pass = e.target.value; update(hubRef, {accounts:state.accounts}); };
         let c2 = document.createElement("button"); c2.textContent="📋"; c2.onclick=()=>navigator.clipboard.writeText(acc.pass);
-        let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
-        c.innerHTML = acc.checked ? "✅" : "";
-        c.onclick = () => { state.accounts[i].checked = !state.accounts[i].checked; update(hubRef, {accounts: state.accounts}); };
+
+        // Ô tích thứ 1
+        let chk1 = document.createElement("button"); chk1.className = "check-btn " + (acc.checked1 ? "checked" : "");
+        chk1.innerHTML = acc.checked1 ? "✅" : "";
+        chk1.onclick = () => { state.accounts[i].checked1 = !state.accounts[i].checked1; update(hubRef, {accounts: state.accounts}); };
+
+        // Ô tích thứ 2
+        let chk2 = document.createElement("button"); chk2.className = "check-btn " + (acc.checked2 ? "checked" : "");
+        chk2.innerHTML = acc.checked2 ? "✅" : "";
+        chk2.onclick = () => { state.accounts[i].checked2 = !state.accounts[i].checked2; update(hubRef, {accounts: state.accounts}); };
+
         div.innerHTML = `<span class="num-label">${i+1}</span>`;
-        div.append(n, c1, p, c2, c);
+        div.append(n, c1, p, c2, chk1, chk2);
         accContainer.appendChild(div);
     });
 
@@ -266,8 +308,15 @@ document.getElementById("btn-copy-all-names").onclick = () => {
     navigator.clipboard.writeText(allNames).then(() => alert("Đã copy toàn bộ tên của 200 account!"));
 };
 
-document.getElementById("btn-reset-acc").onclick = () => {
-    let newAccs = state.accounts.map(a => ({...a, checked: false}));
+// Reset riêng cột tích 1 của 200 acc
+document.getElementById("btn-reset-acc1").onclick = () => {
+    let newAccs = state.accounts.map(a => ({...a, checked1: false}));
+    update(hubRef, {accounts: newAccs});
+};
+
+// Reset riêng cột tích 2 của 200 acc
+document.getElementById("btn-reset-acc2").onclick = () => {
+    let newAccs = state.accounts.map(a => ({...a, checked2: false}));
     update(hubRef, {accounts: newAccs});
 };
 
