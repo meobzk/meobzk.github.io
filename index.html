@@ -35,10 +35,10 @@
     </div>
 </div>
 
+<!-- 3 LINK GIFTUTO HIỂN THỊ TRỰC TIẾP -->
 <div class="card">
-    <h3>🔑 Password chung</h3>
-    <input id="pwd" placeholder="Password chung">
-    <button style="margin-top:10px" id="btn-copy-pwd">📋 Copy Password</button>
+    <h3>🎁 3 Link Giftuto (Nhanh)</h3>
+    <div id="quickGiftutoContainer" style="margin-top:10px"></div>
 </div>
 
 <!-- 10 LINK GIFTUTO -->
@@ -105,6 +105,7 @@ const firebaseConfig = {
     projectId: "meobzk"
 };
 const db = getDatabase(initializeApp(firebaseConfig));
+// Dùng nhánh hub gốc cho trang chính meobzk.github.io
 const hubRef = ref(db, 'hub');
 
 const wifi24List1 = [
@@ -143,12 +144,13 @@ const wifi5List2 = [
     "Hyogo Roast", "Aichi Bean", "Shizuoka Cup", "Hokkaido Lounge", "Kyushu Cafe", "Tokyo Station"
 ];
 
-let state = { mails:[], used:[], giftutos:[], links:[], wifis:[], accounts:[], accounts1000:[], pwd:"", note:"" };
+let state = { mails:[], used:[], quickGiftutos:["","",""], giftutos:[], links:[], wifis:[], accounts:[], accounts1000:[], note:"" };
 
 onValue(hubRef, (snap) => {
     const data = snap.val() || {};
     state.mails = data.mails || Array(10).fill("");
     state.used = data.used || Array(10).fill(false);
+    state.quickGiftutos = data.quickGiftutos || ["","",""];
     state.giftutos = data.giftutos || Array(10).fill("");
     state.links = data.links || Array.from({length: 10}, (_,i) => ({name: "Link "+(i+1), url: ""}));
     
@@ -173,7 +175,6 @@ onValue(hubRef, (snap) => {
         return loadedAccs1000[i] || { name: "", pass: "", checked: false };
     });
     
-    if(document.activeElement.id !== "pwd") pwd.value = data.pwd || "";
     if(document.activeElement.id !== "note") note.value = data.note || "";
     render();
 });
@@ -195,7 +196,25 @@ function render() {
         r.appendChild(b); emails.appendChild(r);
     });
 
-    // 2. Render Giftuto
+    // 1.5. Render 3 Quick Giftutos (Hiển thị thẳng)
+    quickGiftutoContainer.innerHTML = "";
+    state.quickGiftutos.forEach((qUrl, i) => {
+        let div = document.createElement("div"); div.className = "row";
+        let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
+        let input = document.createElement("input"); input.value = qUrl; input.className = "grow"; input.placeholder = "Link Giftuto nhanh " + (i+1); input.id = "qgf_"+i;
+        input.oninput = (e) => { state.quickGiftutos[i] = e.target.value; update(hubRef, {quickGiftutos: state.quickGiftutos}); };
+        
+        let bOpen = document.createElement("button"); bOpen.textContent = "🌐 Mở"; bOpen.style.background = "#52c41a";
+        bOpen.onclick = () => { if(qUrl) window.open(qUrl, "_blank"); };
+
+        let bDel = document.createElement("button"); bDel.textContent = "❌ Xóa"; bDel.style.background = "#ff4d4f";
+        bDel.onclick = () => { state.quickGiftutos[i] = ""; update(hubRef, {quickGiftutos: state.quickGiftutos}); };
+
+        div.append(lbl, input, bOpen, bDel);
+        quickGiftutoContainer.appendChild(div);
+    });
+
+    // 2. Render Giftuto (10 links)
     giftutoContainer.innerHTML = "";
     state.giftutos.forEach((gUrl, i) => {
         let div = document.createElement("div"); div.className = "row";
@@ -328,8 +347,6 @@ document.getElementById("btn-reset-1000").onclick = () => {
     update(hubRef, {accounts1000: newAccs});
 };
 
-document.getElementById("btn-copy-pwd").onclick = () => navigator.clipboard.writeText(pwd.value);
-pwd.oninput = () => update(hubRef, {pwd: pwd.value});
 note.oninput = () => update(hubRef, {note: note.value});
 </script>
 </body>
