@@ -4,29 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Android Setup Hub</title>
-<style>
-    body{font-family:Arial;background:#eef2f5;max-width:900px;margin:auto;padding:16px}
-    .card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
-    .row{display:flex;gap:4px;align-items:center;margin:6px 0}
-    .grow{flex:1}
-    input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
-    button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 8px;cursor:pointer;white-space:nowrap;font-size:12px}
-    .check-btn{background:#fff;border:1px solid #ccc;width:38px;height:35px;font-size:18px;border-radius:6px;cursor:pointer}
-    .checked{background:#d4edda;border-color:#28a745}
-    .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
-    summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
-    .num-label{width:30px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
 
-    /* Mục Lối tắt */
-    .shortcut-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
-    .shortcut-btn{background:#f0f3f8;color:#222;border:1px solid #e0e0e0;border-radius:10px;padding:14px 4px;font-size:15px;font-weight:bold;text-align:center;width:100%}
-    .shortcut-btn:active{background:#dce8ff}
-    .shortcut-edit{border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:10px}
-    .shortcut-edit input{margin-bottom:8px;font-size:14px}
-    .shortcut-edit label{display:block;font-size:12px;color:#666;margin-bottom:4px}
-    @media(max-width:400px){.shortcut-grid{gap:6px}.shortcut-btn{font-size:13px;padding:12px 2px}}
+<style>
+body{font-family:Arial;background:#eef2f5;max-width:900px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:12px;padding:16px;margin:12px 0}
+.row{display:flex;gap:4px;align-items:center;margin:6px 0}
+.grow{flex:1}
+input,textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:6px}
+button{background:#1677ff;color:#fff;border:0;border-radius:6px;padding:8px 8px;cursor:pointer;white-space:nowrap;font-size:12px}
+.check-btn{background:#fff;border:1px solid #ccc;width:38px;height:35px;font-size:18px;border-radius:6px;cursor:pointer}
+.checked{background:#d4edda;border-color:#28a745}
+.linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
+summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
+.num-label{width:30px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
+
+.shortcut-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.shortcut-btn{background:#f0f3f8;color:#222;border:1px solid #e0e0e0;border-radius:10px;padding:14px 4px;font-size:15px;font-weight:bold;text-align:center;width:100%}
+.shortcut-btn:active{background:#dce8ff}
+.shortcut-edit{border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:10px}
+.shortcut-edit input{margin-bottom:8px;font-size:14px}
+.shortcut-edit label{display:block;font-size:12px;color:#666;margin-bottom:4px}
+
+@media(max-width:400px){
+.shortcut-grid{gap:6px}
+.shortcut-btn{font-size:13px;padding:12px 2px}
+}
 </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -44,13 +49,14 @@
     </div>
 </div>
 
-<!-- MỤC LỐI TẮT MỚI -->
 <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 style="margin:8px 0">🔗 Lối tắt</h3>
-        <button id="btn-edit-shortcuts" style="background:#ff4d4f;font-size:14px;padding:8px 14px">✏️ Sửa</button>
+        <button id="btn-edit-shortcuts" style="background:#ff4d4f;font-size:14px;padding:8px 14px">✏ Sửa</button>
     </div>
+
     <div id="shortcutButtons" class="shortcut-grid"></div>
+
     <div id="shortcutEditor" style="display:none">
         <div id="shortcutEditContainer"></div>
         <div style="display:flex;gap:8px;margin-top:12px">
@@ -60,13 +66,11 @@
     </div>
 </div>
 
-<!-- 3 LINK GIFTUTO HIỂN THỊ TRỰC TIẾP -->
 <div class="card">
     <h3>🎁 3 Link Giftuto (Nhanh)</h3>
     <div id="quickGiftutoContainer" style="margin-top:10px"></div>
 </div>
 
-<!-- 10 LINK GIFTUTO -->
 <div class="card">
     <details>
         <summary>🎁 10 Link Giftuto</summary>
@@ -74,7 +78,6 @@
     </details>
 </div>
 
-<!-- 10 LINK NHANH -->
 <div class="card">
     <details>
         <summary>🔗 10 Link nhanh</summary>
@@ -82,7 +85,6 @@
     </details>
 </div>
 
-<!-- MỤC WIFI 4 CỘT -->
 <div class="card">
     <details>
         <summary>📶 31 WiFi (4 Cột: 2x 2.4G & 2x 5G)</summary>
@@ -90,7 +92,6 @@
     </details>
 </div>
 
-<!-- MỤC 200 ACCOUNT -->
 <div class="card">
     <details>
         <summary>👤 200 Account (2 Cột Tích ✅)</summary>
@@ -103,7 +104,6 @@
     </details>
 </div>
 
-<!-- MỤC 1000 ACC -->
 <div class="card">
     <details>
         <summary>👤 1000 Acc</summary>
@@ -131,81 +131,56 @@ const firebaseConfig = {
 };
 
 const db = getDatabase(initializeApp(firebaseConfig));
-const hubRef = ref(db, 'hub');
+const hubRef = ref(db, "hub");
+
+const $ = id => document.getElementById(id);
 
 const defaultShortcuts = [
-    {
-        name:"Line",
-        url:"https://play.google.com/store/apps/details?id=jp.naver.line.android"
-    },
-    {
-        name:"TTL",
-        url:"https://play.google.com/store/apps/details?id=com.ss.android.ugc.tiktok.lite"
-    },
-    {
-        name:"PL SV",
-        url:"https://play.google.com/store/apps/details?id=com.google.android.gms"
-    },
-    {
-        name:"FB",
-        url:"https://play.google.com/store/apps/details?id=com.facebook.katana"
-    },
-    {
-        name:"CR",
-        url:"https://play.google.com/store/apps/details?id=com.android.chrome"
-    },
-    {
-        name:"AS APK",
-        url:"https://www.mediafire.com/file/5k7057bj2dgae1l/uptodown-com.rise.automatic.autoclicker.clicker.apk/file"
-    },
-    {
-        name:"40L",
-        url:"https://www.mediafire.com/file/5p4gjrhlooqch1g/Click_Assistant_Backup_20261007_0037/file"
-    },
-    {
-        name:"40",
-        url:"https://www.mediafire.com/file/30z5zrsi6zr3xat/Click_Assistant_Backup_20260805_1243/file"
-    },
-    {
-        name:"AS",
-        url:"https://play.google.com/store/apps/details?id=com.rise.automatic.autoclicker.clicker"
-    }
+    {name:"Line",url:"https://play.google.com/store/apps/details?id=jp.naver.line.android"},
+    {name:"TTL",url:"https://play.google.com/store/apps/details?id=com.ss.android.ugc.tiktok.lite"},
+    {name:"PL SV",url:"https://play.google.com/store/apps/details?id=com.google.android.gms"},
+    {name:"FB",url:"https://play.google.com/store/apps/details?id=com.facebook.katana"},
+    {name:"CR",url:"https://play.google.com/store/apps/details?id=com.android.chrome"},
+    {name:"AS APK",url:"https://www.mediafire.com/file/5k7057bj2dgae1l/uptodown-com.rise.automatic.autoclicker.clicker.apk/file"},
+    {name:"40L",url:"https://www.mediafire.com/file/5p4gjrhlooqch1g/Click_Assistant_Backup_20261007_0037/file"},
+    {name:"40",url:"https://www.mediafire.com/file/30z5zrsi6zr3xat/Click_Assistant_Backup_20260805_1243/file"},
+    {name:"AS",url:"https://play.google.com/store/apps/details?id=com.rise.automatic.autoclicker.clicker"}
 ];
 
 const wifi24List1 = [
-    "Cafe Hana", "Kissa Sakura", "Tokyo Coffee", "Matcha Hub", "Nihon Cafe",
-    "Osaka Roastery", "Kyoto Brew", "Yuki Cafe", "Sora Coffee", "Mori Cafe",
-    "Haru Stand", "Natsu Brew", "Aki Coffee", "Fuyu Lounge", "Zen Cafe",
-    "Neon Tokyo", "Shibuya Beans", "Shinjuku Cup", "Akiba Cafe", "Ginza Roast",
-    "Roppongi Brew", "Asakusa Coffee", "Fuji View", "Matcha House", "Ueno Beans",
-    "Hokkaido Cup", "Okinawa Chill", "Nagoya Roast", "Sendai Coffee", "Kobe Lounge", "Nippon Cafe"
+    "Cafe Hana","Kissa Sakura","Tokyo Coffee","Matcha Hub","Nihon Cafe",
+    "Osaka Roastery","Kyoto Brew","Yuki Cafe","Sora Coffee","Mori Cafe",
+    "Haru Stand","Natsu Brew","Aki Coffee","Fuyu Lounge","Zen Cafe",
+    "Neon Tokyo","Shibuya Beans","Shinjuku Cup","Akiba Cafe","Ginza Roast",
+    "Roppongi Brew","Asakusa Coffee","Fuji View","Matcha House","Ueno Beans",
+    "Hokkaido Cup","Okinawa Chill","Nagoya Roast","Sendai Coffee","Kobe Lounge","Nippon Cafe"
 ];
 
 const wifi24List2 = [
-    "Cafe Lumiere", "Kissa Retro", "Chiyoda Brew", "Sencha Bar", "Honshu Bean",
-    "Matsue Roast", "Takamatsu Cup", "Aomori Cafe", "Niigata Chill", "Sakai Lounge",
-    "Kawasaki Roast", "Sagamihara Cup", "Hamamatsu Brew", "Okayama Cafe", "Kumamoto Chill",
-    "Kagoshima Bean", "Funabashi Stand", "Hachioji Roast", "Himeji Lounge", "Matsuyama Cup",
-    "Utsunomiya Cafe", "Kanazawa Brew", "Oita Chill", "Nagasaki Roast", "Yokosuka Bean",
-    "Toyama Cup", "Naha Lounge", "Miyazaki Cafe", "Iwate Roast", "Shiga Brew", "Nihonbashi Hub"
+    "Cafe Lumiere","Kissa Retro","Chiyoda Brew","Sencha Bar","Honshu Bean",
+    "Matsue Roast","Takamatsu Cup","Aomori Cafe","Niigata Chill","Sakai Lounge",
+    "Kawasaki Roast","Sagamihara Cup","Hamamatsu Brew","Okayama Cafe","Kumamoto Chill",
+    "Kagoshima Bean","Funabashi Stand","Hachioji Roast","Himeji Lounge","Matsuyama Cup",
+    "Utsunomiya Cafe","Kanazawa Brew","Oita Chill","Nagasaki Roast","Yokosuka Bean",
+    "Toyama Cup","Naha Lounge","Miyazaki Cafe","Iwate Roast","Shiga Brew","Nihonbashi Hub"
 ];
 
 const wifi5List1 = [
-    "Cafe Mugi", "Kissa Machi", "Edo Coffee", "Sencha Hub", "Honshu Cafe",
-    "Hakata Roastery", "Nara Brew", "Hoshi Cafe", "Kaze Coffee", "Tori Cafe",
-    "Kura Stand", "Yama Brew", "Tsuki Coffee", "Umi Lounge", "Miso Cafe",
-    "Cyber Tokyo", "Kanagawa Beans", "Chiba Cup", "Saitama Cafe", "Fukuoka Roast",
-    "Yokohama Brew", "Hiroshima Coffee", "Sapporo View", "Oita House", "Kumamoto Beans",
-    "Nagano Cup", "Shizuoka Chill", "Gunma Roast", "Tochigi Coffee", "Ibaraki Lounge", "Akita Cafe"
+    "Cafe Mugi","Kissa Machi","Edo Coffee","Sencha Hub","Honshu Cafe",
+    "Hakata Roastery","Nara Brew","Hoshi Cafe","Kaze Coffee","Tori Cafe",
+    "Kura Stand","Yama Brew","Tsuki Coffee","Umi Lounge","Miso Cafe",
+    "Cyber Tokyo","Kanagawa Beans","Chiba Cup","Saitama Cafe","Fukuoka Roast",
+    "Yokohama Brew","Hiroshima Coffee","Sapporo View","Oita House","Kumamoto Beans",
+    "Nagano Cup","Shizuoka Chill","Gunma Roast","Tochigi Coffee","Ibaraki Lounge","Akita Cafe"
 ];
 
 const wifi5List2 = [
-    "Cafe Nova", "Kissa Sol", "Minato Brew", "Matcha Lab", "Kansai Roast",
-    "Chiba Hub", "Saitama Lounge", "Ibaraki Cup", "Gifu Cafe", "Yamaguchi Chill",
-    "Nagano Bean", "Gunma Stand", "Tochigi Roast", "Fukushima Lounge", "Miyagi Cup",
-    "Shiga Cafe", "Ehime Brew", "Kochi Chill", "Saga Roast", "Yamagata Bean",
-    "Tokushima Cup", "Kagawa Lounge", "Fukui Cafe", "Wakayama Brew", "Yamanashi Chill",
-    "Hyogo Roast", "Aichi Bean", "Shizuoka Cup", "Hokkaido Lounge", "Kyushu Cafe", "Tokyo Station"
+    "Cafe Nova","Kissa Sol","Minato Brew","Matcha Lab","Kansai Roast",
+    "Chiba Hub","Saitama Lounge","Ibaraki Cup","Gifu Cafe","Yamaguchi Chill",
+    "Nagano Bean","Gunma Stand","Tochigi Roast","Fukushima Lounge","Miyagi Cup",
+    "Shiga Cafe","Ehime Brew","Kochi Chill","Saga Roast","Yamagata Bean",
+    "Tokushima Cup","Kagawa Lounge","Fukui Cafe","Wakayama Brew","Yamanashi Chill",
+    "Hyogo Roast","Aichi Bean","Shizuoka Cup","Hokkaido Lounge","Kyushu Cafe","Tokyo Station"
 ];
 
 let editingShortcuts = false;
@@ -231,11 +206,40 @@ function escapeShortcut(value) {
         .replace(/>/g,"&gt;");
 }
 
+/* Lưu vị trí con trỏ trước khi dựng lại giao diện */
+function getFocusInfo() {
+    const el = document.activeElement;
+
+    if (!el || !el.id) return null;
+
+    return {
+        id:el.id,
+        start:typeof el.selectionStart === "number" ? el.selectionStart : null,
+        end:typeof el.selectionEnd === "number" ? el.selectionEnd : null,
+        direction:el.selectionDirection || "none"
+    };
+}
+
+function restoreFocus(info) {
+    if (!info) return;
+
+    const el = $(info.id);
+    if (!el) return;
+
+    el.focus({preventScroll:true});
+
+    if (info.start !== null && info.end !== null) {
+        try {
+            el.setSelectionRange(info.start,info.end,info.direction);
+        } catch (e) {}
+    }
+}
+
 function renderShortcuts() {
-    const buttons = document.getElementById("shortcutButtons");
-    const editor = document.getElementById("shortcutEditor");
-    const editContainer = document.getElementById("shortcutEditContainer");
-    const editButton = document.getElementById("btn-edit-shortcuts");
+    const buttons = $("shortcutButtons");
+    const editor = $("shortcutEditor");
+    const editContainer = $("shortcutEditContainer");
+    const editButton = $("btn-edit-shortcuts");
 
     buttons.innerHTML = "";
 
@@ -263,7 +267,6 @@ function renderShortcuts() {
 
         state.shortcuts.forEach((item,i) => {
             const box = document.createElement("div");
-
             box.className = "shortcut-edit";
 
             box.innerHTML = `
@@ -276,43 +279,34 @@ function renderShortcuts() {
 
             editContainer.appendChild(box);
         });
-
     } else {
         editor.style.display = "none";
-        editButton.textContent = "✏️ Sửa";
+        editButton.textContent = "✏ Sửa";
     }
 }
 
-// NÚT SỬA
-document.getElementById("btn-edit-shortcuts").onclick = () => {
+$("btn-edit-shortcuts").onclick = () => {
     editingShortcuts = !editingShortcuts;
     renderShortcuts();
 };
 
-// NÚT LƯU
-document.getElementById("btn-save-shortcuts").onclick = () => {
-    const newShortcuts = state.shortcuts.map((item,i) => {
-        return {
-            name:document.getElementById("shortcut-name-"+i).value.trim(),
-            url:document.getElementById("shortcut-url-"+i).value.trim()
-        };
-    });
+$("btn-save-shortcuts").onclick = () => {
+    const newShortcuts = state.shortcuts.map((item,i) => ({
+        name:$("shortcut-name-"+i).value.trim(),
+        url:$("shortcut-url-"+i).value.trim()
+    }));
 
     state.shortcuts = newShortcuts;
 
-    update(hubRef,{
-        shortcuts:newShortcuts
-    });
+    update(hubRef,{shortcuts:newShortcuts});
 
     editingShortcuts = false;
-
     renderShortcuts();
 
     alert("Đã lưu các lối tắt!");
 };
 
-// NÚT HỦY
-document.getElementById("btn-cancel-shortcuts").onclick = () => {
+$("btn-cancel-shortcuts").onclick = () => {
     editingShortcuts = false;
     renderShortcuts();
 };
@@ -330,17 +324,16 @@ onValue(hubRef,(snap) => {
         (_,i) => ({name:"Link "+(i+1),url:""})
     );
 
-    // Nếu Firebase chưa có dữ liệu lối tắt, dùng 9 link mặc định
     state.shortcuts = data.shortcuts || defaultShortcuts;
 
     if (!editingShortcuts) {
         renderShortcuts();
     }
 
-    let loadedWifis = data.wifis || [];
+    const loadedWifis = data.wifis || [];
 
     state.wifis = Array.from({length:31},(_,i) => {
-        let item = loadedWifis[i] || {};
+        const item = loadedWifis[i] || {};
 
         return {
             w24_1:item.w24_1 && item.w24_1 !== "undefined" ? item.w24_1 : wifi24List1[i],
@@ -350,7 +343,7 @@ onValue(hubRef,(snap) => {
         };
     });
 
-    let loadedAccs = data.accounts || [];
+    const loadedAccs = data.accounts || [];
 
     state.accounts = Array.from({length:200},(_,i) => {
         return loadedAccs[i] || {
@@ -361,7 +354,7 @@ onValue(hubRef,(snap) => {
         };
     });
 
-    let loadedAccs1000 = data.accounts1000 || [];
+    const loadedAccs1000 = data.accounts1000 || [];
 
     state.accounts1000 = Array.from({length:1000},(_,i) => {
         return loadedAccs1000[i] || {
@@ -372,27 +365,29 @@ onValue(hubRef,(snap) => {
     });
 
     if (document.activeElement.id !== "note") {
-        note.value = data.note || "";
+        $("note").value = data.note || "";
     }
 
     render();
 });
 
 function render() {
-    const activeId = document.activeElement ? document.activeElement.id : null;
+    const focusInfo = getFocusInfo();
 
-    // 1. Render Mail
-    emails.innerHTML = "";
+    /* 1. Render Mail */
+    $("emails").innerHTML = "";
 
-    cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
+    $("cnt").textContent =
+        "Đã dùng: " + state.used.filter(Boolean).length + "/10";
 
     state.mails.forEach((m,i) => {
-        let r = document.createElement("div");
+        const r = document.createElement("div");
         r.className = "row";
 
-        r.innerHTML = <div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m||"(trống)"}</div>;
+        r.innerHTML =
+            `<div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m || "(trống)"}</div>`;
 
-        let b = document.createElement("button");
+        const b = document.createElement("button");
         b.textContent = "Copy";
 
         b.onclick = () => {
@@ -400,446 +395,360 @@ function render() {
 
             state.used[i] = !state.used[i];
 
-            update(hubRef,{
-                used:state.used
-            });
+            update(hubRef,{used:state.used});
         };
 
         r.appendChild(b);
-        emails.appendChild(r);
+        $("emails").appendChild(r);
     });
 
-    // 1.5. Render 3 Quick Giftutos
-    quickGiftutoContainer.innerHTML = "";
+    /* 2. Render 3 Quick Giftutos */
+    $("quickGiftutoContainer").innerHTML = "";
 
     state.quickGiftutos.forEach((qUrl,i) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "row";
 
-        let lbl = document.createElement("span");
+        const lbl = document.createElement("span");
         lbl.className = "num-label";
         lbl.textContent = i+1;
 
-        let input = document.createElement("input");
+        const input = document.createElement("input");
         input.value = qUrl;
         input.className = "grow";
         input.placeholder = "Link Giftuto nhanh " + (i+1);
         input.id = "qgf_"+i;
 
-        input.oninput = (e) => {
+        input.oninput = e => {
             state.quickGiftutos[i] = e.target.value;
-            update(hubRef,{
-                quickGiftutos:state.quickGiftutos
-            });
+            update(hubRef,{quickGiftutos:state.quickGiftutos});
         };
 
-        let bOpen = document.createElement("button");
+        const bOpen = document.createElement("button");
         bOpen.textContent = "🌐 Mở";
         bOpen.style.background = "#52c41a";
 
         bOpen.onclick = () => {
-            if(qUrl) window.open(qUrl,"_blank");
+            const url = state.quickGiftutos[i];
+            if (url) window.open(url,"_blank","noopener,noreferrer");
         };
 
-        let bDel = document.createElement("button");
+        const bDel = document.createElement("button");
         bDel.textContent = "❌ Xóa";
         bDel.style.background = "#ff4d4f";
 
         bDel.onclick = () => {
             state.quickGiftutos[i] = "";
-
-            update(hubRef,{
-                quickGiftutos:state.quickGiftutos
-            });
+            update(hubRef,{quickGiftutos:state.quickGiftutos});
         };
 
         div.append(lbl,input,bOpen,bDel);
-        quickGiftutoContainer.appendChild(div);
+        $("quickGiftutoContainer").appendChild(div);
     });
 
-    // 2. Render Giftuto (10 links)
-    giftutoContainer.innerHTML = "";
+    /* 3. Render Giftuto 10 links */
+    $("giftutoContainer").innerHTML = "";
 
     state.giftutos.forEach((gUrl,i) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "row";
 
-        let lbl = document.createElement("span");
+        const lbl = document.createElement("span");
         lbl.className = "num-label";
         lbl.textContent = i+1;
 
-        let input = document.createElement("input");
+        const input = document.createElement("input");
         input.value = gUrl;
         input.className = "grow";
         input.placeholder = "Link Giftuto " + (i+1);
         input.id = "gf_"+i;
 
-        input.oninput = (e) => {
+        input.oninput = e => {
             state.giftutos[i] = e.target.value;
-
-            update(hubRef,{
-                giftutos:state.giftutos
-            });
+            update(hubRef,{giftutos:state.giftutos});
         };
 
-        let bOpen = document.createElement("button");
+        const bOpen = document.createElement("button");
         bOpen.textContent = "🌐 Mở";
         bOpen.style.background = "#52c41a";
 
         bOpen.onclick = () => {
-            if(gUrl) window.open(gUrl,"_blank");
+            const url = state.giftutos[i];
+            if (url) window.open(url,"_blank","noopener,noreferrer");
         };
 
-        let bDel = document.createElement("button");
+        const bDel = document.createElement("button");
         bDel.textContent = "❌ Xóa";
         bDel.style.background = "#ff4d4f";
 
         bDel.onclick = () => {
             state.giftutos[i] = "";
-
-            update(hubRef,{
-                giftutos:state.giftutos
-            });
+            update(hubRef,{giftutos:state.giftutos});
         };
 
         div.append(lbl,input,bOpen,bDel);
-        giftutoContainer.appendChild(div);
+        $("giftutoContainer").appendChild(div);
     });
 
-    // 3. Render 10 Links nhanh
-    linksContainer.innerHTML = "";
+    /* 4. Render 10 Links nhanh */
+    $("linksContainer").innerHTML = "";
 
     state.links.forEach((l,i) => {
-        let box = document.createElement("div");
+        const box = document.createElement("div");
         box.className = "linkbox";
 
-        let n = document.createElement("input");
-        n.value = l.name;
+        const n = document.createElement("input");
+        n.value = l.name || "";
         n.id = "ln"+i;
 
-        n.oninput = (e) => {
+        n.oninput = e => {
             state.links[i].name = e.target.value;
-
-            update(hubRef,{
-                links:state.links
-            });
+            update(hubRef,{links:state.links});
         };
 
-        let u = document.createElement("input");
-        u.value = l.url;
+        const u = document.createElement("input");
+        u.value = l.url || "";
         u.id = "lu"+i;
         u.style.marginTop = "5px";
 
-        u.oninput = (e) => {
+        u.oninput = e => {
             state.links[i].url = e.target.value;
-
-            update(hubRef,{
-                links:state.links
-            });
+            update(hubRef,{links:state.links});
         };
 
-        let b = document.createElement("button");
+        const b = document.createElement("button");
         b.textContent = "Mở";
         b.style.marginTop = "8px";
 
         b.onclick = () => {
-            if(l.url) window.open(l.url,"_blank");
+            const url = state.links[i].url;
+            if (url) window.open(url,"_blank","noopener,noreferrer");
         };
 
         box.append(n,u,b);
-        linksContainer.appendChild(box);
+        $("linksContainer").appendChild(box);
     });
 
-    // 4. Render 31 WiFi (4 Cột)
-    wifiContainer.innerHTML = "";
+    /* 5. Render 31 WiFi */
+    $("wifiContainer").innerHTML = "";
 
     state.wifis.forEach((wf,i) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "row";
 
-        let lbl = document.createElement("span");
+        const lbl = document.createElement("span");
         lbl.className = "num-label";
         lbl.textContent = i+1;
 
-        let i1 = document.createElement("input");
-        i1.value = wf.w24_1;
-        i1.className = "grow";
-        i1.placeholder = "2.4G-1";
-        i1.id = "w24_1_"+i;
+        function makeWifiInput(key,placeholder,buttonColor) {
+            const input = document.createElement("input");
+            input.value = wf[key] || "";
+            input.className = "grow";
+            input.placeholder = placeholder;
+            input.id = key+"_"+i;
 
-        i1.oninput = (e) => {
-            state.wifis[i].w24_1 = e.target.value;
+            input.oninput = e => {
+                state.wifis[i][key] = e.target.value;
+                update(hubRef,{wifis:state.wifis});
+            };
 
-            update(hubRef,{
-                wifis:state.wifis
-            });
-        };
+            const copy = document.createElement("button");
+            copy.textContent = "📋";
+            copy.style.background = buttonColor;
+            copy.onclick = () => navigator.clipboard.writeText(state.wifis[i][key] || "");
 
-        let b1 = document.createElement("button");
-        b1.textContent = "📋";
-        b1.style.background = "#52c41a";
-        b1.onclick = () => navigator.clipboard.writeText(wf.w24_1);
+            return [input,copy];
+        }
 
-        let i2 = document.createElement("input");
-        i2.value = wf.w24_2;
-        i2.className = "grow";
-        i2.placeholder = "2.4G-2";
-        i2.id = "w24_2_"+i;
-
-        i2.oninput = (e) => {
-            state.wifis[i].w24_2 = e.target.value;
-
-            update(hubRef,{
-                wifis:state.wifis
-            });
-        };
-
-        let b2 = document.createElement("button");
-        b2.textContent = "📋";
-        b2.style.background = "#13c2c2";
-        b2.onclick = () => navigator.clipboard.writeText(wf.w24_2);
-
-        let i3 = document.createElement("input");
-        i3.value = wf.w5_1;
-        i3.className = "grow";
-        i3.placeholder = "5G-1";
-        i3.id = "w5_1_"+i;
-
-        i3.oninput = (e) => {
-            state.wifis[i].w5_1 = e.target.value;
-
-            update(hubRef,{
-                wifis:state.wifis
-            });
-        };
-
-        let b3 = document.createElement("button");
-        b3.textContent = "📋";
-        b3.style.background = "#722ed1";
-        b3.onclick = () => navigator.clipboard.writeText(wf.w5_1);
-
-        let i4 = document.createElement("input");
-        i4.value = wf.w5_2;
-        i4.className = "grow";
-        i4.placeholder = "5G-2";
-        i4.id = "w5_2_"+i;
-
-        i4.oninput = (e) => {
-            state.wifis[i].w5_2 = e.target.value;
-
-            update(hubRef,{
-                wifis:state.wifis
-            });
-        };
-
-        let b4 = document.createElement("button");
-        b4.textContent = "📋";
-        b4.style.background = "#eb2f96";
-        b4.onclick = () => navigator.clipboard.writeText(wf.w5_2);
+        const [i1,b1] = makeWifiInput("w24_1","2.4G-1","#52c41a");
+        const [i2,b2] = makeWifiInput("w24_2","2.4G-2","#13c2c2");
+        const [i3,b3] = makeWifiInput("w5_1","5G-1","#722ed1");
+        const [i4,b4] = makeWifiInput("w5_2","5G-2","#eb2f96");
 
         div.append(lbl,i1,b1,i2,b2,i3,b3,i4,b4);
-        wifiContainer.appendChild(div);
+        $("wifiContainer").appendChild(div);
     });
 
-    // 5. Render 200 Accounts
-    accContainer.innerHTML = "";
+    /* 6. Render 200 Accounts */
+    $("accContainer").innerHTML = "";
 
     state.accounts.forEach((acc,i) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "row";
 
-        let n = document.createElement("input");
-        n.value = acc.name;
+        const n = document.createElement("input");
+        n.value = acc.name || "";
         n.className = "grow";
         n.placeholder = "Tên";
         n.id = "n"+i;
 
-        n.oninput = (e) => {
+        n.oninput = e => {
             state.accounts[i].name = e.target.value;
-
-            update(hubRef,{
-                accounts:state.accounts
-            });
+            update(hubRef,{accounts:state.accounts});
         };
 
-        let c1 = document.createElement("button");
+        const c1 = document.createElement("button");
         c1.textContent = "📋";
-        c1.onclick = () => navigator.clipboard.writeText(acc.name);
+        c1.onclick = () => navigator.clipboard.writeText(state.accounts[i].name || "");
 
-        let p = document.createElement("input");
-        p.value = acc.pass;
+        const p = document.createElement("input");
+        p.value = acc.pass || "";
         p.style.width = "70px";
         p.placeholder = "Pass";
         p.id = "p"+i;
 
-        p.oninput = (e) => {
+        p.oninput = e => {
             state.accounts[i].pass = e.target.value;
-
-            update(hubRef,{
-                accounts:state.accounts
-            });
+            update(hubRef,{accounts:state.accounts});
         };
 
-        let c2 = document.createElement("button");
+        const c2 = document.createElement("button");
         c2.textContent = "📋";
-        c2.onclick = () => navigator.clipboard.writeText(acc.pass);
+        c2.onclick = () => navigator.clipboard.writeText(state.accounts[i].pass || "");
 
-        let chk1 = document.createElement("button");
+        const chk1 = document.createElement("button");
         chk1.className = "check-btn " + (acc.checked1 ? "checked" : "");
-        chk1.innerHTML = acc.checked1 ? "✅" : "";
+        chk1.textContent = acc.checked1 ? "✅" : "";
 
         chk1.onclick = () => {
             state.accounts[i].checked1 = !state.accounts[i].checked1;
-
-            update(hubRef,{
-                accounts:state.accounts
-            });
+            update(hubRef,{accounts:state.accounts});
         };
 
-        let chk2 = document.createElement("button");
+        const chk2 = document.createElement("button");
         chk2.className = "check-btn " + (acc.checked2 ? "checked" : "");
-        chk2.innerHTML = acc.checked2 ? "✅" : "";
+        chk2.textContent = acc.checked2 ? "✅" : "";
 
         chk2.onclick = () => {
             state.accounts[i].checked2 = !state.accounts[i].checked2;
-
-            update(hubRef,{
-                accounts:state.accounts
-            });
+            update(hubRef,{accounts:state.accounts});
         };
 
-        div.innerHTML = <span class="num-label">${i+1}</span>;
+        const number = document.createElement("span");
+        number.className = "num-label";
+        number.textContent = i+1;
 
-        div.append(n,c1,p,c2,chk1,chk2);
-        accContainer.appendChild(div);
+        div.append(number,n,c1,p,c2,chk1,chk2);
+        $("accContainer").appendChild(div);
     });
 
-    // 6. Render 1000 Accounts
-    acc1000Container.innerHTML = "";
+    /* 7. Render 1000 Accounts */
+    $("acc1000Container").innerHTML = "";
 
     state.accounts1000.forEach((acc,i) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "row";
 
-        let n = document.createElement("input");
-        n.value = acc.name;
+        const number = document.createElement("span");
+        number.className = "num-label";
+        number.style.width = "45px";
+        number.textContent = i+1;
+
+        const n = document.createElement("input");
+        n.value = acc.name || "";
         n.className = "grow";
         n.placeholder = "Tên";
         n.id = "n1000_"+i;
 
-        n.oninput = (e) => {
+        n.oninput = e => {
             state.accounts1000[i].name = e.target.value;
-
-            update(hubRef,{
-                accounts1000:state.accounts1000
-            });
+            update(hubRef,{accounts1000:state.accounts1000});
         };
 
-        let c1 = document.createElement("button");
+        const c1 = document.createElement("button");
         c1.textContent = "📋";
-        c1.onclick = () => navigator.clipboard.writeText(acc.name);
+        c1.onclick = () => navigator.clipboard.writeText(state.accounts1000[i].name || "");
 
-        let p = document.createElement("input");
-        p.value = acc.pass;
+        const p = document.createElement("input");
+        p.value = acc.pass || "";
         p.style.width = "70px";
         p.placeholder = "Pass";
         p.id = "p1000_"+i;
 
-        p.oninput = (e) => {
+        p.oninput = e => {
             state.accounts1000[i].pass = e.target.value;
-
-            update(hubRef,{
-                accounts1000:state.accounts1000
-            });
+            update(hubRef,{accounts1000:state.accounts1000});
         };
 
-        let c2 = document.createElement("button");
+        const c2 = document.createElement("button");
         c2.textContent = "📋";
-        c2.onclick = () => navigator.clipboard.writeText(acc.pass);
+        c2.onclick = () => navigator.clipboard.writeText(state.accounts1000[i].pass || "");
 
-        let c = document.createElement("button");
+        const c = document.createElement("button");
         c.className = "check-btn " + (acc.checked ? "checked" : "");
-        c.innerHTML = acc.checked ? "✅" : "";
+        c.textContent = acc.checked ? "✅" : "";
 
         c.onclick = () => {
             state.accounts1000[i].checked = !state.accounts1000[i].checked;
-
-            update(hubRef,{
-                accounts1000:state.accounts1000
-            });
+            update(hubRef,{accounts1000:state.accounts1000});
         };
 
-        div.innerHTML = <span class="num-label" style="width:45px">${i+1}</span>;
-
-        div.append(n,c1,p,c2,c);
-        acc1000Container.appendChild(div);
+        div.append(number,n,c1,p,c2,c);
+        $("acc1000Container").appendChild(div);
     });
 
-    if(activeId && document.getElementById(activeId)) {
-        document.getElementById(activeId).focus();
-    }
+    /* Khôi phục focus và vị trí con trỏ */
+    restoreFocus(focusInfo);
 }
 
-document.getElementById("btn-update").onclick = () => {
-    state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10);
+/* Cập nhật Mail */
+$("btn-update").onclick = () => {
+    state.mails = $("bulk").value.split("\n").filter(Boolean).slice(0,10);
 
     update(hubRef,{
         mails:state.mails,
         used:Array(10).fill(false)
     });
 
-    bulk.value = "";
+    $("bulk").value = "";
 };
 
-document.getElementById("btn-reset-mail").onclick = () => {
-    update(hubRef,{
-        used:Array(10).fill(false)
-    });
+/* Reset Mail */
+$("btn-reset-mail").onclick = () => {
+    update(hubRef,{used:Array(10).fill(false)});
 };
 
-document.getElementById("btn-copy-all-names").onclick = () => {
-    let allNames = state.accounts.map(acc=>acc.name||"").join("\n");
+/* Copy tất cả tên 200 Account */
+$("btn-copy-all-names").onclick = () => {
+    const allNames = state.accounts.map(acc=>acc.name || "").join("\n");
 
     navigator.clipboard.writeText(allNames).then(() => {
         alert("Đã copy toàn bộ tên của 200 account!");
     });
 };
 
-document.getElementById("btn-reset-acc1").onclick = () => {
-    let newAccs = state.accounts.map(a=>({...a,checked1:false}));
-
-    update(hubRef,{
-        accounts:newAccs
-    });
+/* Reset tích cột 1 */
+$("btn-reset-acc1").onclick = () => {
+    const newAccs = state.accounts.map(a=>({...a,checked1:false}));
+    update(hubRef,{accounts:newAccs});
 };
 
-document.getElementById("btn-reset-acc2").onclick = () => {
-    let newAccs = state.accounts.map(a=>({...a,checked2:false}));
-
-    update(hubRef,{
-        accounts:newAccs
-    });
+/* Reset tích cột 2 */
+$("btn-reset-acc2").onclick = () => {
+    const newAccs = state.accounts.map(a=>({...a,checked2:false}));
+    update(hubRef,{accounts:newAccs});
 };
 
-document.getElementById("btn-copy-all-1000").onclick = () => {
-    let allNames = state.accounts1000.map(acc=>acc.name||"").join("\n");
+/* Copy tất cả tên 1000 Account */
+$("btn-copy-all-1000").onclick = () => {
+    const allNames = state.accounts1000.map(acc=>acc.name || "").join("\n");
 
     navigator.clipboard.writeText(allNames).then(() => {
-        alert("Đã copy toàn bộ tên của 1000 account!");
+        alert("Đã copy toàn bộ tên của 1000 Acc!");
     });
 };
 
-document.getElementById("btn-reset-1000").onclick = () => {
-    let newAccs = state.accounts1000.map(a=>({...a,checked:false}));
-
-    update(hubRef,{
-        accounts1000:newAccs
-    });
+/* Reset tích 1000 Account */
+$("btn-reset-1000").onclick = () => {
+    const newAccs = state.accounts1000.map(a=>({...a,checked:false}));
+    update(hubRef,{accounts1000:newAccs});
 };
 
-note.oninput = () => update(hubRef,{
-    note:note.value
-});
+/* Ghi chú */
+$("note").oninput = () => {
+    update(hubRef,{note:$("note").value});
+};
 </script>
+
 </body>
 </html>
