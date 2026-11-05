@@ -16,6 +16,15 @@
     .linkbox{border:1px solid #ddd;border-radius:10px;padding:10px;margin:10px 0}
     summary{cursor:pointer;font-weight:bold;padding:10px;background:#f9f9f9;border-radius:8px}
     .num-label{width:30px;font-size:12px;color:#666;flex-shrink:0;text-align:center}
+
+    /* Mục Lối tắt */
+    .shortcut-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+    .shortcut-btn{background:#f0f3f8;color:#222;border:1px solid #e0e0e0;border-radius:10px;padding:14px 4px;font-size:15px;font-weight:bold;text-align:center;width:100%}
+    .shortcut-btn:active{background:#dce8ff}
+    .shortcut-edit{border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:10px}
+    .shortcut-edit input{margin-bottom:8px;font-size:14px}
+    .shortcut-edit label{display:block;font-size:12px;color:#666;margin-bottom:4px}
+    @media(max-width:400px){.shortcut-grid{gap:6px}.shortcut-btn{font-size:13px;padding:12px 2px}}
 </style>
 </head>
 <body>
@@ -32,6 +41,22 @@
     <div style="margin-top:10px">
         <button id="btn-update">Cập nhật Mail</button>
         <button id="btn-reset-mail" style="background:#666">Reset Mail</button>
+    </div>
+</div>
+
+<!-- MỤC LỐI TẮT MỚI -->
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:8px 0">🔗 Lối tắt</h3>
+        <button id="btn-edit-shortcuts" style="background:#ff4d4f;font-size:14px;padding:8px 14px">✏️ Sửa</button>
+    </div>
+    <div id="shortcutButtons" class="shortcut-grid"></div>
+    <div id="shortcutEditor" style="display:none">
+        <div id="shortcutEditContainer"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button id="btn-save-shortcuts" style="background:#28a745;flex:1;font-size:14px">💾 Lưu</button>
+            <button id="btn-cancel-shortcuts" style="background:#666;flex:1;font-size:14px">Hủy</button>
+        </div>
     </div>
 </div>
 
@@ -69,10 +94,10 @@
 <div class="card">
     <details>
         <summary>👤 200 Account (2 Cột Tích ✅)</summary>
-        <div style="display:flex; gap:6px; margin:10px 0; flex-wrap:wrap;">
-            <button id="btn-copy-all-names" style="background:#28a745; flex:1; min-width:140px;">📋 Copy tất cả Tên</button>
-            <button id="btn-reset-acc1" style="background:#faad14; flex:1; min-width:140px;">Reset Tích Cột 1 🔄</button>
-            <button id="btn-reset-acc2" style="background:#ff4d4f; flex:1; min-width:140px;">Reset Tích Cột 2 🔄</button>
+        <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">
+            <button id="btn-copy-all-names" style="background:#28a745;flex:1;min-width:140px">📋 Copy tất cả Tên</button>
+            <button id="btn-reset-acc1" style="background:#faad14;flex:1;min-width:140px">Reset Tích Cột 1 🔄</button>
+            <button id="btn-reset-acc2" style="background:#ff4d4f;flex:1;min-width:140px">Reset Tích Cột 2 🔄</button>
         </div>
         <div id="accContainer"></div>
     </details>
@@ -82,9 +107,9 @@
 <div class="card">
     <details>
         <summary>👤 1000 Acc</summary>
-        <div style="display:flex; gap:8px; margin:10px 0;">
-            <button id="btn-copy-all-1000" style="background:#28a745; flex:1;">📋 Copy tất cả Tên 1000 Acc</button>
-            <button id="btn-reset-1000" style="background:#ff4d4f; flex:1;">Reset tất cả dấu tích ✅</button>
+        <div style="display:flex;gap:8px;margin:10px 0">
+            <button id="btn-copy-all-1000" style="background:#28a745;flex:1">📋 Copy tất cả Tên 1000 Acc</button>
+            <button id="btn-reset-1000" style="background:#ff4d4f;flex:1">Reset tất cả dấu tích ✅</button>
         </div>
         <div id="acc1000Container"></div>
     </details>
@@ -104,9 +129,48 @@ const firebaseConfig = {
     databaseURL: "https://meobzk-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "meobzk"
 };
+
 const db = getDatabase(initializeApp(firebaseConfig));
-// Dùng nhánh hub gốc cho trang chính meobzk.github.io
 const hubRef = ref(db, 'hub');
+
+const defaultShortcuts = [
+    {
+        name:"Line",
+        url:"https://play.google.com/store/apps/details?id=jp.naver.line.android"
+    },
+    {
+        name:"TTL",
+        url:"https://play.google.com/store/apps/details?id=com.ss.android.ugc.tiktok.lite"
+    },
+    {
+        name:"PL SV",
+        url:"https://play.google.com/store/apps/details?id=com.google.android.gms"
+    },
+    {
+        name:"FB",
+        url:"https://play.google.com/store/apps/details?id=com.facebook.katana"
+    },
+    {
+        name:"CR",
+        url:"https://play.google.com/store/apps/details?id=com.android.chrome"
+    },
+    {
+        name:"AS APK",
+        url:"https://www.mediafire.com/file/5k7057bj2dgae1l/uptodown-com.rise.automatic.autoclicker.clicker.apk/file"
+    },
+    {
+        name:"40L",
+        url:"https://www.mediafire.com/file/5p4gjrhlooqch1g/Click_Assistant_Backup_20261007_0037/file"
+    },
+    {
+        name:"40",
+        url:"https://www.mediafire.com/file/30z5zrsi6zr3xat/Click_Assistant_Backup_20260805_1243/file"
+    },
+    {
+        name:"AS",
+        url:"https://play.google.com/store/apps/details?id=com.rise.automatic.autoclicker.clicker"
+    }
+];
 
 const wifi24List1 = [
     "Cafe Hana", "Kissa Sakura", "Tokyo Coffee", "Matcha Hub", "Nihon Cafe",
@@ -144,210 +208,638 @@ const wifi5List2 = [
     "Hyogo Roast", "Aichi Bean", "Shizuoka Cup", "Hokkaido Lounge", "Kyushu Cafe", "Tokyo Station"
 ];
 
-let state = { mails:[], used:[], quickGiftutos:["","",""], giftutos:[], links:[], wifis:[], accounts:[], accounts1000:[], note:"" };
+let editingShortcuts = false;
 
-onValue(hubRef, (snap) => {
+let state = {
+    mails:[],
+    used:[],
+    quickGiftutos:["","",""],
+    giftutos:[],
+    links:[],
+    shortcuts:defaultShortcuts,
+    wifis:[],
+    accounts:[],
+    accounts1000:[],
+    note:""
+};
+
+function escapeShortcut(value) {
+    return String(value || "")
+        .replace(/&/g,"&amp;")
+        .replace(/"/g,"&quot;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+}
+
+function renderShortcuts() {
+    const buttons = document.getElementById("shortcutButtons");
+    const editor = document.getElementById("shortcutEditor");
+    const editContainer = document.getElementById("shortcutEditContainer");
+    const editButton = document.getElementById("btn-edit-shortcuts");
+
+    buttons.innerHTML = "";
+
+    state.shortcuts.forEach((item,i) => {
+        const btn = document.createElement("button");
+
+        btn.className = "shortcut-btn";
+        btn.textContent = item.name || ("Link " + (i+1));
+
+        btn.onclick = () => {
+            if (item.url) {
+                window.open(item.url,"_blank","noopener,noreferrer");
+            } else {
+                alert("Link chưa được cập nhật!");
+            }
+        };
+
+        buttons.appendChild(btn);
+    });
+
+    if (editingShortcuts) {
+        editor.style.display = "block";
+        editButton.textContent = "✖ Đóng";
+        editContainer.innerHTML = "";
+
+        state.shortcuts.forEach((item,i) => {
+            const box = document.createElement("div");
+
+            box.className = "shortcut-edit";
+
+            box.innerHTML = `
+                <label for="shortcut-name-${i}">Tên nút ${i+1}</label>
+                <input id="shortcut-name-${i}" value="${escapeShortcut(item.name)}" placeholder="Tên lối tắt">
+
+                <label for="shortcut-url-${i}">Đường dẫn URL</label>
+                <input id="shortcut-url-${i}" value="${escapeShortcut(item.url)}" placeholder="Nhập link mới">
+            `;
+
+            editContainer.appendChild(box);
+        });
+
+    } else {
+        editor.style.display = "none";
+        editButton.textContent = "✏️ Sửa";
+    }
+}
+
+// NÚT SỬA
+document.getElementById("btn-edit-shortcuts").onclick = () => {
+    editingShortcuts = !editingShortcuts;
+    renderShortcuts();
+};
+
+// NÚT LƯU
+document.getElementById("btn-save-shortcuts").onclick = () => {
+    const newShortcuts = state.shortcuts.map((item,i) => {
+        return {
+            name:document.getElementById("shortcut-name-"+i).value.trim(),
+            url:document.getElementById("shortcut-url-"+i).value.trim()
+        };
+    });
+
+    state.shortcuts = newShortcuts;
+
+    update(hubRef,{
+        shortcuts:newShortcuts
+    });
+
+    editingShortcuts = false;
+
+    renderShortcuts();
+
+    alert("Đã lưu các lối tắt!");
+};
+
+// NÚT HỦY
+document.getElementById("btn-cancel-shortcuts").onclick = () => {
+    editingShortcuts = false;
+    renderShortcuts();
+};
+
+onValue(hubRef,(snap) => {
     const data = snap.val() || {};
+
     state.mails = data.mails || Array(10).fill("");
     state.used = data.used || Array(10).fill(false);
     state.quickGiftutos = data.quickGiftutos || ["","",""];
     state.giftutos = data.giftutos || Array(10).fill("");
-    state.links = data.links || Array.from({length: 10}, (_,i) => ({name: "Link "+(i+1), url: ""}));
-    
+
+    state.links = data.links || Array.from(
+        {length:10},
+        (_,i) => ({name:"Link "+(i+1),url:""})
+    );
+
+    // Nếu Firebase chưa có dữ liệu lối tắt, dùng 9 link mặc định
+    state.shortcuts = data.shortcuts || defaultShortcuts;
+
+    if (!editingShortcuts) {
+        renderShortcuts();
+    }
+
     let loadedWifis = data.wifis || [];
-    state.wifis = Array.from({length: 31}, (_, i) => {
+
+    state.wifis = Array.from({length:31},(_,i) => {
         let item = loadedWifis[i] || {};
-        return { 
-            w24_1: item.w24_1 && item.w24_1 !== "undefined" ? item.w24_1 : wifi24List1[i], 
-            w24_2: item.w24_2 && item.w24_2 !== "undefined" ? item.w24_2 : wifi24List2[i], 
-            w5_1: item.w5_1 && item.w5_1 !== "undefined" ? item.w5_1 : wifi5List1[i], 
-            w5_2: item.w5_2 && item.w5_2 !== "undefined" ? item.w5_2 : wifi5List2[i] 
+
+        return {
+            w24_1:item.w24_1 && item.w24_1 !== "undefined" ? item.w24_1 : wifi24List1[i],
+            w24_2:item.w24_2 && item.w24_2 !== "undefined" ? item.w24_2 : wifi24List2[i],
+            w5_1:item.w5_1 && item.w5_1 !== "undefined" ? item.w5_1 : wifi5List1[i],
+            w5_2:item.w5_2 && item.w5_2 !== "undefined" ? item.w5_2 : wifi5List2[i]
         };
     });
 
     let loadedAccs = data.accounts || [];
-    state.accounts = Array.from({length: 200}, (_, i) => {
-        return loadedAccs[i] || { name: "", pass: "", checked1: false, checked2: false };
+
+    state.accounts = Array.from({length:200},(_,i) => {
+        return loadedAccs[i] || {
+            name:"",
+            pass:"",
+            checked1:false,
+            checked2:false
+        };
     });
 
     let loadedAccs1000 = data.accounts1000 || [];
-    state.accounts1000 = Array.from({length: 1000}, (_, i) => {
-        return loadedAccs1000[i] || { name: "", pass: "", checked: false };
+
+    state.accounts1000 = Array.from({length:1000},(_,i) => {
+        return loadedAccs1000[i] || {
+            name:"",
+            pass:"",
+            checked:false
+        };
     });
-    
-    if(document.activeElement.id !== "note") note.value = data.note || "";
+
+    if (document.activeElement.id !== "note") {
+        note.value = data.note || "";
+    }
+
     render();
 });
 
 function render() {
     const activeId = document.activeElement ? document.activeElement.id : null;
-    
+
     // 1. Render Mail
-    emails.innerHTML = ""; cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
+    emails.innerHTML = "";
+
+    cnt.textContent = "Đã dùng: " + state.used.filter(x=>x).length + "/10";
+
     state.mails.forEach((m,i) => {
-        let r = document.createElement("div"); r.className = "row";
-        r.innerHTML = `<div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m||"(trống)"}</div>`;
-        let b = document.createElement("button"); b.textContent = "Copy";
-        b.onclick = () => { 
-            if(m) navigator.clipboard.writeText(m); 
-            state.used[i] = !state.used[i]; 
-            update(hubRef, {used: state.used}); 
+        let r = document.createElement("div");
+        r.className = "row";
+
+        r.innerHTML = <div class="grow"><b>Mail ${i+1}</b> ${state.used[i] ? "✅" : ""}<br>${m||"(trống)"}</div>;
+
+        let b = document.createElement("button");
+        b.textContent = "Copy";
+
+        b.onclick = () => {
+            if (m) navigator.clipboard.writeText(m);
+
+            state.used[i] = !state.used[i];
+
+            update(hubRef,{
+                used:state.used
+            });
         };
-        r.appendChild(b); emails.appendChild(r);
+
+        r.appendChild(b);
+        emails.appendChild(r);
     });
 
-    // 1.5. Render 3 Quick Giftutos (Hiển thị thẳng)
+    // 1.5. Render 3 Quick Giftutos
     quickGiftutoContainer.innerHTML = "";
-    state.quickGiftutos.forEach((qUrl, i) => {
-        let div = document.createElement("div"); div.className = "row";
-        let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
-        let input = document.createElement("input"); input.value = qUrl; input.className = "grow"; input.placeholder = "Link Giftuto nhanh " + (i+1); input.id = "qgf_"+i;
-        input.oninput = (e) => { state.quickGiftutos[i] = e.target.value; update(hubRef, {quickGiftutos: state.quickGiftutos}); };
-        
-        let bOpen = document.createElement("button"); bOpen.textContent = "🌐 Mở"; bOpen.style.background = "#52c41a";
-        bOpen.onclick = () => { if(qUrl) window.open(qUrl, "_blank"); };
 
-        let bDel = document.createElement("button"); bDel.textContent = "❌ Xóa"; bDel.style.background = "#ff4d4f";
-        bDel.onclick = () => { state.quickGiftutos[i] = ""; update(hubRef, {quickGiftutos: state.quickGiftutos}); };
+    state.quickGiftutos.forEach((qUrl,i) => {
+        let div = document.createElement("div");
+        div.className = "row";
 
-        div.append(lbl, input, bOpen, bDel);
+        let lbl = document.createElement("span");
+        lbl.className = "num-label";
+        lbl.textContent = i+1;
+
+        let input = document.createElement("input");
+        input.value = qUrl;
+        input.className = "grow";
+        input.placeholder = "Link Giftuto nhanh " + (i+1);
+        input.id = "qgf_"+i;
+
+        input.oninput = (e) => {
+            state.quickGiftutos[i] = e.target.value;
+            update(hubRef,{
+                quickGiftutos:state.quickGiftutos
+            });
+        };
+
+        let bOpen = document.createElement("button");
+        bOpen.textContent = "🌐 Mở";
+        bOpen.style.background = "#52c41a";
+
+        bOpen.onclick = () => {
+            if(qUrl) window.open(qUrl,"_blank");
+        };
+
+        let bDel = document.createElement("button");
+        bDel.textContent = "❌ Xóa";
+        bDel.style.background = "#ff4d4f";
+
+        bDel.onclick = () => {
+            state.quickGiftutos[i] = "";
+
+            update(hubRef,{
+                quickGiftutos:state.quickGiftutos
+            });
+        };
+
+        div.append(lbl,input,bOpen,bDel);
         quickGiftutoContainer.appendChild(div);
     });
 
     // 2. Render Giftuto (10 links)
     giftutoContainer.innerHTML = "";
-    state.giftutos.forEach((gUrl, i) => {
-        let div = document.createElement("div"); div.className = "row";
-        let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
-        let input = document.createElement("input"); input.value = gUrl; input.className = "grow"; input.placeholder = "Link Giftuto " + (i+1); input.id = "gf_"+i;
-        input.oninput = (e) => { state.giftutos[i] = e.target.value; update(hubRef, {giftutos: state.giftutos}); };
-        
-        let bOpen = document.createElement("button"); bOpen.textContent = "🌐 Mở"; bOpen.style.background = "#52c41a";
-        bOpen.onclick = () => { if(gUrl) window.open(gUrl, "_blank"); };
 
-        let bDel = document.createElement("button"); bDel.textContent = "❌ Xóa"; bDel.style.background = "#ff4d4f";
-        bDel.onclick = () => { state.giftutos[i] = ""; update(hubRef, {giftutos: state.giftutos}); };
+    state.giftutos.forEach((gUrl,i) => {
+        let div = document.createElement("div");
+        div.className = "row";
 
-        div.append(lbl, input, bOpen, bDel);
+        let lbl = document.createElement("span");
+        lbl.className = "num-label";
+        lbl.textContent = i+1;
+
+        let input = document.createElement("input");
+        input.value = gUrl;
+        input.className = "grow";
+        input.placeholder = "Link Giftuto " + (i+1);
+        input.id = "gf_"+i;
+
+        input.oninput = (e) => {
+            state.giftutos[i] = e.target.value;
+
+            update(hubRef,{
+                giftutos:state.giftutos
+            });
+        };
+
+        let bOpen = document.createElement("button");
+        bOpen.textContent = "🌐 Mở";
+        bOpen.style.background = "#52c41a";
+
+        bOpen.onclick = () => {
+            if(gUrl) window.open(gUrl,"_blank");
+        };
+
+        let bDel = document.createElement("button");
+        bDel.textContent = "❌ Xóa";
+        bDel.style.background = "#ff4d4f";
+
+        bDel.onclick = () => {
+            state.giftutos[i] = "";
+
+            update(hubRef,{
+                giftutos:state.giftutos
+            });
+        };
+
+        div.append(lbl,input,bOpen,bDel);
         giftutoContainer.appendChild(div);
     });
 
     // 3. Render 10 Links nhanh
     linksContainer.innerHTML = "";
+
     state.links.forEach((l,i) => {
-        let box = document.createElement("div"); box.className = "linkbox";
-        let n = document.createElement("input"); n.value = l.name; n.id = "ln"+i; n.oninput = (e)=>{state.links[i].name=e.target.value; update(hubRef, {links:state.links});};
-        let u = document.createElement("input"); u.value = l.url; u.id = "lu"+i; u.style.marginTop="5px"; u.oninput = (e)=>{state.links[i].url=e.target.value; update(hubRef, {links:state.links});};
-        let b = document.createElement("button"); b.textContent="Mở"; b.style.marginTop="8px"; b.onclick=()=>{if(l.url) window.open(l.url,"_blank")};
-        box.append(n, u, b); linksContainer.appendChild(box);
+        let box = document.createElement("div");
+        box.className = "linkbox";
+
+        let n = document.createElement("input");
+        n.value = l.name;
+        n.id = "ln"+i;
+
+        n.oninput = (e) => {
+            state.links[i].name = e.target.value;
+
+            update(hubRef,{
+                links:state.links
+            });
+        };
+
+        let u = document.createElement("input");
+        u.value = l.url;
+        u.id = "lu"+i;
+        u.style.marginTop = "5px";
+
+        u.oninput = (e) => {
+            state.links[i].url = e.target.value;
+
+            update(hubRef,{
+                links:state.links
+            });
+        };
+
+        let b = document.createElement("button");
+        b.textContent = "Mở";
+        b.style.marginTop = "8px";
+
+        b.onclick = () => {
+            if(l.url) window.open(l.url,"_blank");
+        };
+
+        box.append(n,u,b);
+        linksContainer.appendChild(box);
     });
 
     // 4. Render 31 WiFi (4 Cột)
     wifiContainer.innerHTML = "";
-    state.wifis.forEach((wf, i) => {
-        let div = document.createElement("div"); div.className = "row";
-        let lbl = document.createElement("span"); lbl.className = "num-label"; lbl.textContent = i+1;
-        
-        let i1 = document.createElement("input"); i1.value = wf.w24_1; i1.className = "grow"; i1.placeholder = "2.4G-1"; i1.id = "w24_1_"+i;
-        i1.oninput = (e) => { state.wifis[i].w24_1 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b1 = document.createElement("button"); b1.textContent = "📋"; b1.style.background = "#52c41a";
+
+    state.wifis.forEach((wf,i) => {
+        let div = document.createElement("div");
+        div.className = "row";
+
+        let lbl = document.createElement("span");
+        lbl.className = "num-label";
+        lbl.textContent = i+1;
+
+        let i1 = document.createElement("input");
+        i1.value = wf.w24_1;
+        i1.className = "grow";
+        i1.placeholder = "2.4G-1";
+        i1.id = "w24_1_"+i;
+
+        i1.oninput = (e) => {
+            state.wifis[i].w24_1 = e.target.value;
+
+            update(hubRef,{
+                wifis:state.wifis
+            });
+        };
+
+        let b1 = document.createElement("button");
+        b1.textContent = "📋";
+        b1.style.background = "#52c41a";
         b1.onclick = () => navigator.clipboard.writeText(wf.w24_1);
 
-        let i2 = document.createElement("input"); i2.value = wf.w24_2; i2.className = "grow"; i2.placeholder = "2.4G-2"; i2.id = "w24_2_"+i;
-        i2.oninput = (e) => { state.wifis[i].w24_2 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b2 = document.createElement("button"); b2.textContent = "📋"; b2.style.background = "#13c2c2";
+        let i2 = document.createElement("input");
+        i2.value = wf.w24_2;
+        i2.className = "grow";
+        i2.placeholder = "2.4G-2";
+        i2.id = "w24_2_"+i;
+
+        i2.oninput = (e) => {
+            state.wifis[i].w24_2 = e.target.value;
+
+            update(hubRef,{
+                wifis:state.wifis
+            });
+        };
+
+        let b2 = document.createElement("button");
+        b2.textContent = "📋";
+        b2.style.background = "#13c2c2";
         b2.onclick = () => navigator.clipboard.writeText(wf.w24_2);
 
-        let i3 = document.createElement("input"); i3.value = wf.w5_1; i3.className = "grow"; i3.placeholder = "5G-1"; i3.id = "w5_1_"+i;
-        i3.oninput = (e) => { state.wifis[i].w5_1 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b3 = document.createElement("button"); b3.textContent = "📋"; b3.style.background = "#722ed1";
+        let i3 = document.createElement("input");
+        i3.value = wf.w5_1;
+        i3.className = "grow";
+        i3.placeholder = "5G-1";
+        i3.id = "w5_1_"+i;
+
+        i3.oninput = (e) => {
+            state.wifis[i].w5_1 = e.target.value;
+
+            update(hubRef,{
+                wifis:state.wifis
+            });
+        };
+
+        let b3 = document.createElement("button");
+        b3.textContent = "📋";
+        b3.style.background = "#722ed1";
         b3.onclick = () => navigator.clipboard.writeText(wf.w5_1);
 
-        let i4 = document.createElement("input"); i4.value = wf.w5_2; i4.className = "grow"; i4.placeholder = "5G-2"; i4.id = "w5_2_"+i;
-        i4.oninput = (e) => { state.wifis[i].w5_2 = e.target.value; update(hubRef, {wifis: state.wifis}); };
-        let b4 = document.createElement("button"); b4.textContent = "📋"; b4.style.background = "#eb2f96";
+        let i4 = document.createElement("input");
+        i4.value = wf.w5_2;
+        i4.className = "grow";
+        i4.placeholder = "5G-2";
+        i4.id = "w5_2_"+i;
+
+        i4.oninput = (e) => {
+            state.wifis[i].w5_2 = e.target.value;
+
+            update(hubRef,{
+                wifis:state.wifis
+            });
+        };
+
+        let b4 = document.createElement("button");
+        b4.textContent = "📋";
+        b4.style.background = "#eb2f96";
         b4.onclick = () => navigator.clipboard.writeText(wf.w5_2);
 
-        div.append(lbl, i1, b1, i2, b2, i3, b3, i4, b4);
+        div.append(lbl,i1,b1,i2,b2,i3,b3,i4,b4);
         wifiContainer.appendChild(div);
     });
 
     // 5. Render 200 Accounts
     accContainer.innerHTML = "";
-    state.accounts.forEach((acc, i) => {
-        let div = document.createElement("div"); div.className = "row";
-        
-        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n"+i; 
-        n.oninput = (e)=>{ state.accounts[i].name = e.target.value; update(hubRef, {accounts:state.accounts}); };
-        let c1 = document.createElement("button"); c1.textContent="📋"; c1.onclick=()=>navigator.clipboard.writeText(acc.name);
-        
-        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p"+i;
-        p.oninput = (e)=>{ state.accounts[i].pass = e.target.value; update(hubRef, {accounts:state.accounts}); };
-        let c2 = document.createElement("button"); c2.textContent="📋"; c2.onclick=()=>navigator.clipboard.writeText(acc.pass);
 
-        let chk1 = document.createElement("button"); chk1.className = "check-btn " + (acc.checked1 ? "checked" : "");
+    state.accounts.forEach((acc,i) => {
+        let div = document.createElement("div");
+        div.className = "row";
+
+        let n = document.createElement("input");
+        n.value = acc.name;
+        n.className = "grow";
+        n.placeholder = "Tên";
+        n.id = "n"+i;
+
+        n.oninput = (e) => {
+            state.accounts[i].name = e.target.value;
+
+            update(hubRef,{
+                accounts:state.accounts
+            });
+        };
+
+        let c1 = document.createElement("button");
+        c1.textContent = "📋";
+        c1.onclick = () => navigator.clipboard.writeText(acc.name);
+
+        let p = document.createElement("input");
+        p.value = acc.pass;
+        p.style.width = "70px";
+        p.placeholder = "Pass";
+        p.id = "p"+i;
+
+        p.oninput = (e) => {
+            state.accounts[i].pass = e.target.value;
+
+            update(hubRef,{
+                accounts:state.accounts
+            });
+        };
+
+        let c2 = document.createElement("button");
+        c2.textContent = "📋";
+        c2.onclick = () => navigator.clipboard.writeText(acc.pass);
+
+        let chk1 = document.createElement("button");
+        chk1.className = "check-btn " + (acc.checked1 ? "checked" : "");
         chk1.innerHTML = acc.checked1 ? "✅" : "";
-        chk1.onclick = () => { state.accounts[i].checked1 = !state.accounts[i].checked1; update(hubRef, {accounts: state.accounts}); };
 
-        let chk2 = document.createElement("button"); chk2.className = "check-btn " + (acc.checked2 ? "checked" : "");
+        chk1.onclick = () => {
+            state.accounts[i].checked1 = !state.accounts[i].checked1;
+
+            update(hubRef,{
+                accounts:state.accounts
+            });
+        };
+
+        let chk2 = document.createElement("button");
+        chk2.className = "check-btn " + (acc.checked2 ? "checked" : "");
         chk2.innerHTML = acc.checked2 ? "✅" : "";
-        chk2.onclick = () => { state.accounts[i].checked2 = !state.accounts[i].checked2; update(hubRef, {accounts: state.accounts}); };
 
-        div.innerHTML = `<span class="num-label">${i+1}</span>`;
-        div.append(n, c1, p, c2, chk1, chk2);
+        chk2.onclick = () => {
+            state.accounts[i].checked2 = !state.accounts[i].checked2;
+
+            update(hubRef,{
+                accounts:state.accounts
+            });
+        };
+
+        div.innerHTML = <span class="num-label">${i+1}</span>;
+
+        div.append(n,c1,p,c2,chk1,chk2);
         accContainer.appendChild(div);
     });
 
     // 6. Render 1000 Accounts
     acc1000Container.innerHTML = "";
-    state.accounts1000.forEach((acc, i) => {
-        let div = document.createElement("div"); div.className = "row";
-        let n = document.createElement("input"); n.value = acc.name; n.className = "grow"; n.placeholder = "Tên"; n.id = "n1000_"+i; 
-        n.oninput = (e)=>{ state.accounts1000[i].name = e.target.value; update(hubRef, {accounts1000:state.accounts1000}); };
-        let c1 = document.createElement("button"); c1.textContent="📋"; c1.onclick=()=>navigator.clipboard.writeText(acc.name);
-        let p = document.createElement("input"); p.value = acc.pass; p.style.width="70px"; p.placeholder = "Pass"; p.id = "p1000_"+i;
-        p.oninput = (e)=>{ state.accounts1000[i].pass = e.target.value; update(hubRef, {accounts1000:state.accounts1000}); };
-        let c2 = document.createElement("button"); c2.textContent="📋"; c2.onclick=()=>navigator.clipboard.writeText(acc.pass);
-        let c = document.createElement("button"); c.className = "check-btn " + (acc.checked ? "checked" : "");
+
+    state.accounts1000.forEach((acc,i) => {
+        let div = document.createElement("div");
+        div.className = "row";
+
+        let n = document.createElement("input");
+        n.value = acc.name;
+        n.className = "grow";
+        n.placeholder = "Tên";
+        n.id = "n1000_"+i;
+
+        n.oninput = (e) => {
+            state.accounts1000[i].name = e.target.value;
+
+            update(hubRef,{
+                accounts1000:state.accounts1000
+            });
+        };
+
+        let c1 = document.createElement("button");
+        c1.textContent = "📋";
+        c1.onclick = () => navigator.clipboard.writeText(acc.name);
+
+        let p = document.createElement("input");
+        p.value = acc.pass;
+        p.style.width = "70px";
+        p.placeholder = "Pass";
+        p.id = "p1000_"+i;
+
+        p.oninput = (e) => {
+            state.accounts1000[i].pass = e.target.value;
+
+            update(hubRef,{
+                accounts1000:state.accounts1000
+            });
+        };
+
+        let c2 = document.createElement("button");
+        c2.textContent = "📋";
+        c2.onclick = () => navigator.clipboard.writeText(acc.pass);
+
+        let c = document.createElement("button");
+        c.className = "check-btn " + (acc.checked ? "checked" : "");
         c.innerHTML = acc.checked ? "✅" : "";
-        c.onclick = () => { state.accounts1000[i].checked = !state.accounts1000[i].checked; update(hubRef, {accounts1000: state.accounts1000}); };
-        div.innerHTML = `<span class="num-label" style="width:45px">${i+1}</span>`;
-        div.append(n, c1, p, c2, c);
+
+        c.onclick = () => {
+            state.accounts1000[i].checked = !state.accounts1000[i].checked;
+
+            update(hubRef,{
+                accounts1000:state.accounts1000
+            });
+        };
+
+        div.innerHTML = <span class="num-label" style="width:45px">${i+1}</span>;
+
+        div.append(n,c1,p,c2,c);
         acc1000Container.appendChild(div);
     });
 
-    if(activeId && document.getElementById(activeId)) document.getElementById(activeId).focus();
+    if(activeId && document.getElementById(activeId)) {
+        document.getElementById(activeId).focus();
+    }
 }
 
-document.getElementById("btn-update").onclick = () => { state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10); update(hubRef, {mails: state.mails, used: Array(10).fill(false)}); bulk.value=""; };
-document.getElementById("btn-reset-mail").onclick = () => update(hubRef, {used: Array(10).fill(false)});
+document.getElementById("btn-update").onclick = () => {
+    state.mails = bulk.value.split("\n").filter(Boolean).slice(0,10);
+
+    update(hubRef,{
+        mails:state.mails,
+        used:Array(10).fill(false)
+    });
+
+    bulk.value = "";
+};
+
+document.getElementById("btn-reset-mail").onclick = () => {
+    update(hubRef,{
+        used:Array(10).fill(false)
+    });
+};
 
 document.getElementById("btn-copy-all-names").onclick = () => {
-    let allNames = state.accounts.map(acc => acc.name || "").join("\n");
-    navigator.clipboard.writeText(allNames).then(() => alert("Đã copy toàn bộ tên của 200 account!"));
+    let allNames = state.accounts.map(acc=>acc.name||"").join("\n");
+
+    navigator.clipboard.writeText(allNames).then(() => {
+        alert("Đã copy toàn bộ tên của 200 account!");
+    });
 };
 
 document.getElementById("btn-reset-acc1").onclick = () => {
-    let newAccs = state.accounts.map(a => ({...a, checked1: false}));
-    update(hubRef, {accounts: newAccs});
+    let newAccs = state.accounts.map(a=>({...a,checked1:false}));
+
+    update(hubRef,{
+        accounts:newAccs
+    });
 };
 
 document.getElementById("btn-reset-acc2").onclick = () => {
-    let newAccs = state.accounts.map(a => ({...a, checked2: false}));
-    update(hubRef, {accounts: newAccs});
+    let newAccs = state.accounts.map(a=>({...a,checked2:false}));
+
+    update(hubRef,{
+        accounts:newAccs
+    });
 };
 
 document.getElementById("btn-copy-all-1000").onclick = () => {
-    let allNames = state.accounts1000.map(acc => acc.name || "").join("\n");
-    navigator.clipboard.writeText(allNames).then(() => alert("Đã copy toàn bộ tên của 1000 account!"));
+    let allNames = state.accounts1000.map(acc=>acc.name||"").join("\n");
+
+    navigator.clipboard.writeText(allNames).then(() => {
+        alert("Đã copy toàn bộ tên của 1000 account!");
+    });
 };
 
 document.getElementById("btn-reset-1000").onclick = () => {
-    let newAccs = state.accounts1000.map(a => ({...a, checked: false}));
-    update(hubRef, {accounts1000: newAccs});
+    let newAccs = state.accounts1000.map(a=>({...a,checked:false}));
+
+    update(hubRef,{
+        accounts1000:newAccs
+    });
 };
 
-note.oninput = () => update(hubRef, {note: note.value});
+note.oninput = () => update(hubRef,{
+    note:note.value
+});
 </script>
 </body>
 </html>
